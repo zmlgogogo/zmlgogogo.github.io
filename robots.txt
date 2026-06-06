@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://zmlgogogo.github.io/sitemap.xml
