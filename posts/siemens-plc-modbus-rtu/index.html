@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>西门子 PLC 的 Modbus (RTU) 通讯指令详解 | ZML&#39;s Blogs</title>
+<meta name="keywords" content="西门子, PLC, Modbus, RTU, 工业通讯, TIA Portal">
+<meta name="description" content="全面讲解西门子 S7-1200/1500 与 S7-200 SMART 平台下 Modbus RTU 通讯指令的用法，涵盖硬件接线、通讯组态、主站/从站指令参数、功能码、寄存器地址映射、状态错误码与实战示例。">
+<meta name="author" content="ZML">
+<link rel="canonical" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8402523d366be05a2a71a1e346aadc28a50ae3e87baa9354b032bd5db2654f9e.css" integrity="sha256-hAJSPTZr4FoqcaHjRqrcKKUK4&#43;h7qpNUsDK9XbJlT54=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://zmlgogogo.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://zmlgogogo.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://zmlgogogo.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://zmlgogogo.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://zmlgogogo.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh-cn" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+  <meta property="og:site_name" content="ZML&#39;s Blogs">
+  <meta property="og:title" content="西门子 PLC 的 Modbus (RTU) 通讯指令详解">
+  <meta property="og:description" content="全面讲解西门子 S7-1200/1500 与 S7-200 SMART 平台下 Modbus RTU 通讯指令的用法，涵盖硬件接线、通讯组态、主站/从站指令参数、功能码、寄存器地址映射、状态错误码与实战示例。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-10T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-06-10T00:00:00+00:00">
+    <meta property="article:tag" content="西门子">
+    <meta property="article:tag" content="PLC">
+    <meta property="article:tag" content="Modbus">
+    <meta property="article:tag" content="RTU">
+    <meta property="article:tag" content="工业通讯">
+    <meta property="article:tag" content="TIA Portal">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="西门子 PLC 的 Modbus (RTU) 通讯指令详解">
+  <meta name="twitter:description" content="全面讲解西门子 S7-1200/1500 与 S7-200 SMART 平台下 Modbus RTU 通讯指令的用法，涵盖硬件接线、通讯组态、主站/从站指令参数、功能码、寄存器地址映射、状态错误码与实战示例。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://zmlgogogo.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "西门子 PLC 的 Modbus (RTU) 通讯指令详解",
+      "item": "https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "西门子 PLC 的 Modbus (RTU) 通讯指令详解",
+  "name": "西门子 PLC 的 Modbus (RTU) 通讯指令详解",
+  "description": "全面讲解西门子 S7-1200/1500 与 S7-200 SMART 平台下 Modbus RTU 通讯指令的用法，涵盖硬件接线、通讯组态、主站/从站指令参数、功能码、寄存器地址映射、状态错误码与实战示例。",
+  "keywords": [
+    "西门子", "PLC", "Modbus", "RTU", "工业通讯", "TIA Portal"
+  ],
+  "articleBody": "Modbus RTU 是工业现场最常见的串行通讯协议之一，凭借协议开放、实现简单、设备支持广泛的特点，被大量用于 PLC 与变频器、仪表、温控器、电表等设备之间的数据交换。本文系统梳理西门子两大主流平台 —— S7-1200/1500（TIA Portal） 与 S7-200 SMART —— 中 Modbus RTU 通讯指令的用法、参数含义和实战要点。\n一、Modbus RTU 基础回顾 在动手写程序之前，先理清几个绕不开的概念。\n1.1 物理层与帧结构 Modbus RTU 工作在 RS-485（或 RS-232） 串行总线上，采用主从（Master/Slave）半双工通讯：\n总线上只能有 一个主站，可挂接多个从站（理论 247 个，实际受驱动能力限制通常 ≤32 个）。 每个从站有唯一的 从站地址（1~247），地址 0 为广播。 主站发起请求，从站被动应答；从站之间不能直接通讯。 一帧 RTU 报文结构如下：\n从站地址 功能码 数据区 CRC 校验 1 字节 1 字节 N 字节 2 字节 帧与帧之间以 ≥3.5 个字符的静默时间 分隔。\n1.2 常用功能码 功能码 名称 作用 操作对象 01 (0x01) 读线圈 读取多个开关量输出 线圈（可读写位） 02 (0x02) 读离散量输入 读取多个开关量输入 输入位（只读） 03 (0x03) 读保持寄存器 读取多个字寄存器 保持寄存器（可读写字） 04 (0x04) 读输入寄存器 读取多个字寄存器 输入寄存器（只读字） 05 (0x05) 写单个线圈 写一个开关量输出 线圈 06 (0x06) 写单个保持寄存器 写一个字 保持寄存器 15 (0x0F) 写多个线圈 批量写开关量 线圈 16 (0x10) 写多个保持寄存器 批量写字 保持寄存器 1.3 Modbus 地址模型与「偏移」陷阱 Modbus 标准定义了四类数据区，协议地址从 0 开始，但设备手册常用「逻辑地址 / PLC 地址」从 1 开始，这是新手最容易踩的坑：\n数据区 逻辑地址范围 协议地址 功能码 线圈 Coils 00001 ~ 09999 0x0000 起 01 / 05 / 15 离散输入 Discrete Inputs 10001 ~ 19999 0x0000 起 02 输入寄存器 Input Registers 30001 ~ 39999 0x0000 起 04 保持寄存器 Holding Registers 40001 ~ 49999 0x0000 起 03 / 06 / 16 关键点：例如手册写的「保持寄存器 40001」对应协议地址 0，「40100」对应协议地址 99。西门子指令中填的是**协议地址（从 0 开始）**还是带区号的地址，不同平台不一样，下文会逐一说明。\n二、S7-1200 / S7-1500（TIA Portal） S7-1200/1500 通过 CM 1241（RS-485/RS-232）通讯模块 或 CB 1241（RS-485 通讯板） 实现 Modbus RTU。核心是三条指令，位于指令树 通信 → 通信处理器 → MODBUS (RTU)：\nModbus_Comm_Load：组态串口参数，每个端口上电时调用一次。 Modbus_Master：作为 Modbus 主站收发数据。 Modbus_Slave：作为 Modbus 从站响应外部主站。 2.1 硬件与组态步骤 在设备组态中添加 CM 1241 (RS422/485) 或 CB 1241 (RS485) 模块。 接线：RS-485 使用 T/RA (−) 与 T/RB (+) 两根信号线，长距离需在总线两端接 120Ω 终端电阻，并注意共地。 程序里调用三条指令，背景 DB 由 TIA Portal 自动生成。 2.2 Modbus_Comm_Load —— 串口初始化 通常放在 OB100（启动 OB）中调用一次，或用首次扫描位 FirstScan 触发。\nModbus_Comm_Load ┌────────────────────┐ REQ ───►│ REQ DONE ├──► 完成标志 PORT ──►│ PORT ERROR├──► 错误标志 9600 ───►│ BAUD STATUS├──► 状态字 0 ───►│ PARITY │ 0 ───►│ FLOW_CTRL │ 1000 ───►│ RESP_TO │ \u0026DB ────►│ MB_DB │ └────────────────────┘ 主要参数：\n参数 说明 典型值 REQ 上升沿触发执行 首次扫描脉冲 PORT 通讯端口硬件标识符（从「系统常量」选择，如 Local~CM_1241...） — BAUD 波特率 9600 / 19200 PARITY 校验：0 无，1 奇，2 偶 通常 0 或 2 FLOW_CTRL 流控，默认 0 0 RESP_TO 响应超时 (ms) 1000 MB_DB 关联到 Modbus_Master/Modbus_Slave 的背景 DB（用 \u0026\"DB名\"） — MB_DB 必须指向后续主/从指令的背景数据块，把串口和收发指令绑定在一起，这一步漏了会导致通讯不通。\n2.3 Modbus_Master —— 作为主站 Modbus_Master ┌────────────────────┐ REQ ───►│ REQ DONE ├──► 完成 1 ───►│ MB_ADDR BUSY ├──► 忙 3 ───►│ MODE ERROR ├──► 错误 0 ───►│ DATA_ADDR STATUS├──► 状态字 100 ───►│ DATA_LEN │ P#DB ───►│ DATA_PTR │ └────────────────────┘ 参数 说明 REQ 上升沿发起一次请求（注意是边沿触发，不能常 1） MB_ADDR 目标从站地址 1~247 MODE 读写方向：0=读，1=写（与 DATA_ADDR 一起决定功能码） DATA_ADDR Modbus 起始地址，直接填带区号的逻辑地址，如 40001、30001、00001、10001 DATA_LEN 读写的位数 / 字数 DATA_PTR 数据在 PLC 中的存放指针，指向 DB 或 M 区，如 P#DB10.DBX0.0 或用符号 MODE / DATA_ADDR 与功能码的对应关系（西门子用这两者自动推导功能码）：\n功能码 MODE DATA_ADDR 范围 数据长度 01 读线圈 0 1 ~ 9999 1~2000 位 02 读离散输入 0 10001 ~ 19999 1~2000 位 03 读保持寄存器 0 40001 ~ 49999 1~125 字 04 读输入寄存器 0 30001 ~ 39999 1~125 字 05/15 写线圈 1 1 ~ 9999 1 或多个位 06/16 写保持寄存器 1 40001 ~ 49999 1 或多个字 在 S7-1200/1500 中 DATA_ADDR 用的是 40001 这种带区号的逻辑地址，指令内部会自动换算成协议地址并选功能码。这点和下面 S7-200 SMART 的 Addr 参数一致。\n2.4 Modbus_Slave —— 作为从站 当 S7-1200/1500 需要被第三方主站（如触摸屏、上位机、另一台 PLC）轮询时使用：\n参数 说明 MB_ADDR 本机从站地址 MB_HOLD_REG 指向作为「保持寄存器区」的 DB，外部主站读写的就是这块内存 NDR 新数据到达（主站写入了数据） DR 数据被读取 ERROR / STATUS 错误与状态 将 MB_HOLD_REG 指向一个非优化访问的全局 DB（需在 DB 属性里取消勾选「优化的块访问」），即可把该 DB 映射为对外的 40001 起始保持寄存器区。\n2.5 多请求轮询要点 Modbus_Master 同一时刻只能处理一条请求。要轮询多个从站或多种功能码，必须：\n用 BUSY / DONE 做状态机，一条完成后再发下一条； 切换 MB_ADDR、MODE、DATA_ADDR、DATA_PTR 后再给 REQ 一个上升沿； 所有读写指令共用同一个背景 DB（即都绑定到同一个 Modbus_Comm_Load）。 一个简化的轮询思路（SCL 伪代码）：\nCASE step OF 0: // 读 1 号站保持寄存器 \"Modbus_Master\"(REQ := trig, MB_ADDR := 1, MODE := 0, DATA_ADDR := 40001, DATA_LEN := 10, DATA_PTR := \"rdData\"); IF \"Modbus_Master\".DONE THEN step := 10; END_IF; 10: // 写 2 号站保持寄存器 \"Modbus_Master\"(REQ := trig, MB_ADDR := 2, MODE := 1, DATA_ADDR := 40001, DATA_LEN := 5, DATA_PTR := \"wrData\"); IF \"Modbus_Master\".DONE THEN step := 0; END_IF; END_CASE; 三、S7-200 SMART S7-200 SMART 通过 CPU 本体的 RS-485 端口（Port 0） 或 SB CM01 信号板（Port 1） 通讯。指令通过 库（Library） 提供，位于 指令 → 库 → Modbus RTU Master / Slave，调用前需先在项目里编译一次以分配库存储区。\n3.1 主站指令 主站需要两条指令配合：\nMBUS_CTRL —— 初始化（每个扫描周期调用） MBUS_CTRL ┌──────────────┐ EN ───►│ EN │ ON ───►│ Mode Done ├──► 初始化完成 9600 ───►│ Baud Error ├──► 错误码 2 ───►│ Parity │ 1000 ───►│ Timeout │ └──────────────┘ 参数 说明 Mode 1=启用 Modbus 协议占用端口，0=恢复为 PPI（让端口给编程口） Baud 波特率 Parity 0 无，1 奇，2 偶 Timeout 等待从站应答的超时 (ms) Done 初始化完成置 1 Error 错误码 MBUS_CTRL 必须每个扫描周期都执行（EN 端常通），不是只调一次。\nMBUS_MSG —— 收发报文 MBUS_MSG ┌──────────────┐ EN ────►│ EN │ First ──►│ First Done ├──► 完成 1 ───►│ Slave Error ├──► 错误码 3 ───►│ RW │ 40001 ───►│ Addr │ 10 ───►│ Count │ \u0026VB100───►│ DataPtr │ └──────────────┘ 参数 说明 First 上升沿触发一次发送，关键！必须用边沿信号，不能常 1，否则会反复重发 Slave 从站地址 RW 0=读，1=写 Addr Modbus 地址，填带区号逻辑地址：00001线圈 / 10001离散输入 / 30001输入寄存器 / 40001保持寄存器 Count 读写数量（位或字） DataPtr 数据缓冲区指针，如 \u0026VB100 Done 完成置 1 Error 错误码 多条 MBUS_MSG 轮询：同样只能逐条执行。常见做法是把多个 MBUS_MSG 串成轮询，用各自的 Done 触发下一条的 First，或用计数器/状态字循环切换。\n3.2 从站指令 MBUS_INIT —— 从站初始化（仅首次扫描调用一次） 参数 说明 Mode 1=Modbus 从站，0=PPI Addr 本机从站地址 1~247 Baud / Parity 波特率 / 校验 Delay 字符间附加延时 MaxIQ 可访问的 I/O 点数（0~128），一般 128 MaxAI 可访问的模拟量输入字数 MaxHold 可被主站访问的 V 区保持寄存器字数 HoldStart 保持寄存器起始地址，如 \u0026VB0，对应主站读写的 40001 与 MBUS_CTRL 不同，MBUS_INIT 只在 首次扫描（SM0.1） 调用一次。\nMBUS_SLAVE —— 从站响应（每周期调用） 每个扫描周期执行，自动响应主站请求，输出 Done（有读写动作）与 Error。\n3.3 S7-200 SMART 从站地址映射 从站模式下，外部主站访问的地址映射到 SMART 的内存：\nModbus 地址 对应 SMART 区域 00001 起（线圈） Q 区输出 10001 起（离散输入） I 区输入 30001 起（输入寄存器） AIW 模拟量输入 40001 起（保持寄存器） 由 HoldStart 指定的 V 区 四、实战示例：S7-1200 读取变频器频率 以读取某变频器（从站地址 1）的实际输出频率为例，假设手册标明：实际频率位于保持寄存器 40020，单位 0.01Hz。\nOB100 启动块：调用 Modbus_Comm_Load，PORT 选 CM1241，BAUD=9600，PARITY=2（偶校验，按变频器手册），MB_DB := \u0026\"Modbus_Master_DB\"。 OB1 主程序： // 每 200ms 产生一个读取脉冲 trigRead \"Modbus_Master\"(REQ := trigRead, MB_ADDR := 1, MODE := 0, // 读 DATA_ADDR:= 40020, // 保持寄存器 40020 DATA_LEN := 1, // 读 1 个字 DATA_PTR := \"freqRaw\"); // INT 变量 IF \"Modbus_Master\".DONE THEN realFreq := INT_TO_REAL(freqRaw) * 0.01; // 换算成 Hz END_IF; 若需要写频率给定（写到 40021），把 MODE 改为 1、DATA_ADDR := 40021、DATA_PTR 指向给定值变量，并在读完成后再触发写。 五、常见错误码与排查 各平台 STATUS / Error 输出的高频错误及含义：\n错误现象 可能原因 排查方向 始终超时无应答 接线 A/B 反接、波特率/校验/从站地址不匹配 用万用表/抓包确认 A(+)、B(−)，核对参数三件套 CRC 校验错误 干扰、终端电阻缺失、波特率过高 加 120Ω 终端电阻、降波特率、信号线用屏蔽双绞 非法数据地址 (0x02) DATA_ADDR/Addr 超出从站实际地址范围或区号错 核对手册寄存器表，注意 40001 偏移 非法功能 (0x01) 从站不支持该功能码 改用从站支持的功能码（如 03 与 04 别搞混） 间歇性丢包 多主站冲突、轮询过快、未等 Done 保证单主站、用状态机串行轮询 数据高低字节颠倒 字节序 / 字序（大小端）差异 对 32 位数据做字交换，或在指令/变量侧调整 排查口诀 先通物理层：A/B 接线、共地、终端电阻、屏蔽接地。 再对通讯参数：波特率、数据位、校验位、停止位、从站地址，主从必须完全一致。 后核地址映射：功能码、寄存器地址（注意 0 偏移）、读写长度。 最后看时序：REQ/First 必须边沿触发；多请求用 Done/BUSY 串行轮询。 六、两大平台指令对照表 功能 S7-1200/1500 S7-200 SMART 串口/协议初始化 Modbus_Comm_Load 主站 MBUS_CTRL / 从站 MBUS_INIT 主站收发 Modbus_Master MBUS_MSG 从站响应 Modbus_Slave MBUS_SLAVE 触发方式 REQ 上升沿 First 上升沿 地址填法 DATA_ADDR 填 40001 等逻辑地址 Addr 填 40001 等逻辑地址 数据指针 DATA_PTR（P# 指针 / 符号） DataPtr（如 \u0026VB100） 初始化调用时机 Comm_Load 仅启动时一次 CTRL 每周期 / INIT 仅首扫一次 结语 Modbus RTU 在西门子平台上的实现并不复杂，难点几乎都集中在三处：接线与终端电阻、通讯参数一致性、寄存器地址映射（尤其是 40001 的偏移）。掌握 S7-1200/1500 的 Comm_Load + Master/Slave 三件套，以及 S7-200 SMART 的 CTRL/INIT + MSG/SLAVE 组合，再配合状态机做好多请求轮询，就能稳定地把现场仪表、变频器的数据接入 PLC。遇到不通时，按「物理层 → 通讯参数 → 地址映射 → 时序」的顺序排查，事半功倍。\n",
+  "wordCount" : "1001",
+  "inLanguage": "zh-cn",
+  "datePublished": "2026-06-10T00:00:00Z",
+  "dateModified": "2026-06-10T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "ZML"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ZML's Blogs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://zmlgogogo.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://zmlgogogo.github.io/" accesskey="h" title="ZML&#39;s Blogs (Alt + H)">ZML&#39;s Blogs</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://zmlgogogo.github.io/archives" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/">主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      西门子 PLC 的 Modbus (RTU) 通讯指令详解
+    </h1>
+    <div class="post-description">
+      全面讲解西门子 S7-1200/1500 与 S7-200 SMART 平台下 Modbus RTU 通讯指令的用法，涵盖硬件接线、通讯组态、主站/从站指令参数、功能码、寄存器地址映射、状态错误码与实战示例。
+    </div>
+    <div class="post-meta">
+
+<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>5 分钟</span>&nbsp;·&nbsp;<span>ZML</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/zmlgogogo/zmlgogogo.github.io/posts/siemens-plc-modbus-rtu.md" rel="noopener noreferrer edit" target="_blank">提出修改建议</a>
+    </span>
+
+</div>
+  </header> <details class="toc"  open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">目录</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%e4%b8%80modbus-rtu-%e5%9f%ba%e7%a1%80%e5%9b%9e%e9%a1%be" aria-label="一、Modbus RTU 基础回顾">一、Modbus RTU 基础回顾</a><ul>
+                    
+            <li>
+                <a href="#11-%e7%89%a9%e7%90%86%e5%b1%82%e4%b8%8e%e5%b8%a7%e7%bb%93%e6%9e%84" aria-label="1.1 物理层与帧结构">1.1 物理层与帧结构</a></li>
+            <li>
+                <a href="#12-%e5%b8%b8%e7%94%a8%e5%8a%9f%e8%83%bd%e7%a0%81" aria-label="1.2 常用功能码">1.2 常用功能码</a></li>
+            <li>
+                <a href="#13-modbus-%e5%9c%b0%e5%9d%80%e6%a8%a1%e5%9e%8b%e4%b8%8e%e5%81%8f%e7%a7%bb%e9%99%b7%e9%98%b1" aria-label="1.3 Modbus 地址模型与「偏移」陷阱">1.3 Modbus 地址模型与「偏移」陷阱</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%ba%8cs7-1200--s7-1500tia-portal" aria-label="二、S7-1200 / S7-1500（TIA Portal）">二、S7-1200 / S7-1500（TIA Portal）</a><ul>
+                    
+            <li>
+                <a href="#21-%e7%a1%ac%e4%bb%b6%e4%b8%8e%e7%bb%84%e6%80%81%e6%ad%a5%e9%aa%a4" aria-label="2.1 硬件与组态步骤">2.1 硬件与组态步骤</a></li>
+            <li>
+                <a href="#22-modbus_comm_load--%e4%b8%b2%e5%8f%a3%e5%88%9d%e5%a7%8b%e5%8c%96" aria-label="2.2 Modbus_Comm_Load —— 串口初始化">2.2 Modbus_Comm_Load —— 串口初始化</a></li>
+            <li>
+                <a href="#23-modbus_master--%e4%bd%9c%e4%b8%ba%e4%b8%bb%e7%ab%99" aria-label="2.3 Modbus_Master —— 作为主站">2.3 Modbus_Master —— 作为主站</a></li>
+            <li>
+                <a href="#24-modbus_slave--%e4%bd%9c%e4%b8%ba%e4%bb%8e%e7%ab%99" aria-label="2.4 Modbus_Slave —— 作为从站">2.4 Modbus_Slave —— 作为从站</a></li>
+            <li>
+                <a href="#25-%e5%a4%9a%e8%af%b7%e6%b1%82%e8%bd%ae%e8%af%a2%e8%a6%81%e7%82%b9" aria-label="2.5 多请求轮询要点">2.5 多请求轮询要点</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%b8%89s7-200-smart" aria-label="三、S7-200 SMART">三、S7-200 SMART</a><ul>
+                    
+            <li>
+                <a href="#31-%e4%b8%bb%e7%ab%99%e6%8c%87%e4%bb%a4" aria-label="3.1 主站指令">3.1 主站指令</a><ul>
+                    
+            <li>
+                <a href="#mbus_ctrl--%e5%88%9d%e5%a7%8b%e5%8c%96%e6%af%8f%e4%b8%aa%e6%89%ab%e6%8f%8f%e5%91%a8%e6%9c%9f%e8%b0%83%e7%94%a8" aria-label="MBUS_CTRL —— 初始化（每个扫描周期调用）">MBUS_CTRL —— 初始化（每个扫描周期调用）</a></li>
+            <li>
+                <a href="#mbus_msg--%e6%94%b6%e5%8f%91%e6%8a%a5%e6%96%87" aria-label="MBUS_MSG —— 收发报文">MBUS_MSG —— 收发报文</a></li></ul>
+            </li>
+            <li>
+                <a href="#32-%e4%bb%8e%e7%ab%99%e6%8c%87%e4%bb%a4" aria-label="3.2 从站指令">3.2 从站指令</a><ul>
+                    
+            <li>
+                <a href="#mbus_init--%e4%bb%8e%e7%ab%99%e5%88%9d%e5%a7%8b%e5%8c%96%e4%bb%85%e9%a6%96%e6%ac%a1%e6%89%ab%e6%8f%8f%e8%b0%83%e7%94%a8%e4%b8%80%e6%ac%a1" aria-label="MBUS_INIT —— 从站初始化（仅首次扫描调用一次）">MBUS_INIT —— 从站初始化（仅首次扫描调用一次）</a></li>
+            <li>
+                <a href="#mbus_slave--%e4%bb%8e%e7%ab%99%e5%93%8d%e5%ba%94%e6%af%8f%e5%91%a8%e6%9c%9f%e8%b0%83%e7%94%a8" aria-label="MBUS_SLAVE —— 从站响应（每周期调用）">MBUS_SLAVE —— 从站响应（每周期调用）</a></li></ul>
+            </li>
+            <li>
+                <a href="#33-s7-200-smart-%e4%bb%8e%e7%ab%99%e5%9c%b0%e5%9d%80%e6%98%a0%e5%b0%84" aria-label="3.3 S7-200 SMART 从站地址映射">3.3 S7-200 SMART 从站地址映射</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%9b%9b%e5%ae%9e%e6%88%98%e7%a4%ba%e4%be%8bs7-1200-%e8%af%bb%e5%8f%96%e5%8f%98%e9%a2%91%e5%99%a8%e9%a2%91%e7%8e%87" aria-label="四、实战示例：S7-1200 读取变频器频率">四、实战示例：S7-1200 读取变频器频率</a></li>
+            <li>
+                <a href="#%e4%ba%94%e5%b8%b8%e8%a7%81%e9%94%99%e8%af%af%e7%a0%81%e4%b8%8e%e6%8e%92%e6%9f%a5" aria-label="五、常见错误码与排查">五、常见错误码与排查</a><ul>
+                    
+            <li>
+                <a href="#%e6%8e%92%e6%9f%a5%e5%8f%a3%e8%af%80" aria-label="排查口诀">排查口诀</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%85%ad%e4%b8%a4%e5%a4%a7%e5%b9%b3%e5%8f%b0%e6%8c%87%e4%bb%a4%e5%af%b9%e7%85%a7%e8%a1%a8" aria-label="六、两大平台指令对照表">六、两大平台指令对照表</a></li>
+            <li>
+                <a href="#%e7%bb%93%e8%af%ad" aria-label="结语">结语</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p>Modbus RTU 是工业现场最常见的串行通讯协议之一，凭借协议开放、实现简单、设备支持广泛的特点，被大量用于 PLC 与变频器、仪表、温控器、电表等设备之间的数据交换。本文系统梳理西门子两大主流平台 —— <strong>S7-1200/1500（TIA Portal）</strong> 与 <strong>S7-200 SMART</strong> —— 中 Modbus RTU 通讯指令的用法、参数含义和实战要点。</p>
+<h2 id="一modbus-rtu-基础回顾">一、Modbus RTU 基础回顾<a hidden class="anchor" aria-hidden="true" href="#一modbus-rtu-基础回顾">#</a></h2>
+<p>在动手写程序之前，先理清几个绕不开的概念。</p>
+<h3 id="11-物理层与帧结构">1.1 物理层与帧结构<a hidden class="anchor" aria-hidden="true" href="#11-物理层与帧结构">#</a></h3>
+<p>Modbus RTU 工作在 <strong>RS-485（或 RS-232）</strong> 串行总线上，采用主从（Master/Slave）半双工通讯：</p>
+<ul>
+<li>总线上只能有 <strong>一个主站</strong>，可挂接多个从站（理论 247 个，实际受驱动能力限制通常 ≤32 个）。</li>
+<li>每个从站有唯一的 <strong>从站地址（1~247）</strong>，地址 0 为广播。</li>
+<li>主站发起请求，从站被动应答；从站之间不能直接通讯。</li>
+</ul>
+<p>一帧 RTU 报文结构如下：</p>
+<table>
+	<thead>
+			<tr>
+					<th style="text-align: center">从站地址</th>
+					<th style="text-align: center">功能码</th>
+					<th style="text-align: center">数据区</th>
+					<th style="text-align: center">CRC 校验</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: center">1 字节</td>
+					<td style="text-align: center">1 字节</td>
+					<td style="text-align: center">N 字节</td>
+					<td style="text-align: center">2 字节</td>
+			</tr>
+	</tbody>
+</table>
+<p>帧与帧之间以 <strong>≥3.5 个字符的静默时间</strong> 分隔。</p>
+<h3 id="12-常用功能码">1.2 常用功能码<a hidden class="anchor" aria-hidden="true" href="#12-常用功能码">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th style="text-align: center">功能码</th>
+					<th>名称</th>
+					<th>作用</th>
+					<th>操作对象</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: center">01 (0x01)</td>
+					<td>读线圈</td>
+					<td>读取多个开关量输出</td>
+					<td>线圈（可读写位）</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">02 (0x02)</td>
+					<td>读离散量输入</td>
+					<td>读取多个开关量输入</td>
+					<td>输入位（只读）</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">03 (0x03)</td>
+					<td>读保持寄存器</td>
+					<td>读取多个字寄存器</td>
+					<td>保持寄存器（可读写字）</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">04 (0x04)</td>
+					<td>读输入寄存器</td>
+					<td>读取多个字寄存器</td>
+					<td>输入寄存器（只读字）</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">05 (0x05)</td>
+					<td>写单个线圈</td>
+					<td>写一个开关量输出</td>
+					<td>线圈</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">06 (0x06)</td>
+					<td>写单个保持寄存器</td>
+					<td>写一个字</td>
+					<td>保持寄存器</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">15 (0x0F)</td>
+					<td>写多个线圈</td>
+					<td>批量写开关量</td>
+					<td>线圈</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">16 (0x10)</td>
+					<td>写多个保持寄存器</td>
+					<td>批量写字</td>
+					<td>保持寄存器</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="13-modbus-地址模型与偏移陷阱">1.3 Modbus 地址模型与「偏移」陷阱<a hidden class="anchor" aria-hidden="true" href="#13-modbus-地址模型与偏移陷阱">#</a></h3>
+<p>Modbus 标准定义了四类数据区，<strong>协议地址从 0 开始</strong>，但设备手册常用「逻辑地址 / PLC 地址」从 1 开始，这是新手最容易踩的坑：</p>
+<table>
+	<thead>
+			<tr>
+					<th>数据区</th>
+					<th>逻辑地址范围</th>
+					<th>协议地址</th>
+					<th>功能码</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>线圈 Coils</td>
+					<td>00001 ~ 09999</td>
+					<td>0x0000 起</td>
+					<td>01 / 05 / 15</td>
+			</tr>
+			<tr>
+					<td>离散输入 Discrete Inputs</td>
+					<td>10001 ~ 19999</td>
+					<td>0x0000 起</td>
+					<td>02</td>
+			</tr>
+			<tr>
+					<td>输入寄存器 Input Registers</td>
+					<td>30001 ~ 39999</td>
+					<td>0x0000 起</td>
+					<td>04</td>
+			</tr>
+			<tr>
+					<td>保持寄存器 Holding Registers</td>
+					<td>40001 ~ 49999</td>
+					<td>0x0000 起</td>
+					<td>03 / 06 / 16</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p><strong>关键点</strong>：例如手册写的「保持寄存器 40001」对应协议地址 <code>0</code>，「40100」对应协议地址 <code>99</code>。西门子指令中填的是**协议地址（从 0 开始）**还是带区号的地址，不同平台不一样，下文会逐一说明。</p>
+</blockquote>
+<hr>
+<h2 id="二s7-1200--s7-1500tia-portal">二、S7-1200 / S7-1500（TIA Portal）<a hidden class="anchor" aria-hidden="true" href="#二s7-1200--s7-1500tia-portal">#</a></h2>
+<p>S7-1200/1500 通过 <strong>CM 1241（RS-485/RS-232）通讯模块</strong> 或 <strong>CB 1241（RS-485 通讯板）</strong> 实现 Modbus RTU。核心是三条指令，位于指令树 <code>通信 → 通信处理器 → MODBUS (RTU)</code>：</p>
+<ul>
+<li><strong><code>Modbus_Comm_Load</code></strong>：组态串口参数，每个端口上电时调用一次。</li>
+<li><strong><code>Modbus_Master</code></strong>：作为 Modbus 主站收发数据。</li>
+<li><strong><code>Modbus_Slave</code></strong>：作为 Modbus 从站响应外部主站。</li>
+</ul>
+<h3 id="21-硬件与组态步骤">2.1 硬件与组态步骤<a hidden class="anchor" aria-hidden="true" href="#21-硬件与组态步骤">#</a></h3>
+<ol>
+<li>在设备组态中添加 CM 1241 (RS422/485) 或 CB 1241 (RS485) 模块。</li>
+<li>接线：RS-485 使用 <strong>T/RA (−)</strong> 与 <strong>T/RB (+)</strong> 两根信号线，长距离需在总线两端接 <strong>120Ω 终端电阻</strong>，并注意共地。</li>
+<li>程序里调用三条指令，背景 DB 由 TIA Portal 自动生成。</li>
+</ol>
+<h3 id="22-modbus_comm_load--串口初始化">2.2 Modbus_Comm_Load —— 串口初始化<a hidden class="anchor" aria-hidden="true" href="#22-modbus_comm_load--串口初始化">#</a></h3>
+<p>通常放在 OB100（启动 OB）中调用一次，或用首次扫描位 <code>FirstScan</code> 触发。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">              Modbus_Comm_Load
+</span></span><span class="line"><span class="cl">            ┌────────────────────┐
+</span></span><span class="line"><span class="cl">    REQ ───►│ REQ           DONE ├──► 完成标志
+</span></span><span class="line"><span class="cl">    PORT ──►│ PORT          ERROR├──► 错误标志
+</span></span><span class="line"><span class="cl">   9600 ───►│ BAUD         STATUS├──► 状态字
+</span></span><span class="line"><span class="cl">      0 ───►│ PARITY             │
+</span></span><span class="line"><span class="cl">      0 ───►│ FLOW_CTRL          │
+</span></span><span class="line"><span class="cl">   1000 ───►│ RESP_TO            │
+</span></span><span class="line"><span class="cl">   &amp;DB ────►│ MB_DB              │
+</span></span><span class="line"><span class="cl">            └────────────────────┘
+</span></span></code></pre></div><p>主要参数：</p>
+<table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+					<th>典型值</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>REQ</code></td>
+					<td>上升沿触发执行</td>
+					<td>首次扫描脉冲</td>
+			</tr>
+			<tr>
+					<td><code>PORT</code></td>
+					<td>通讯端口硬件标识符（从「系统常量」选择，如 <code>Local~CM_1241...</code>）</td>
+					<td>—</td>
+			</tr>
+			<tr>
+					<td><code>BAUD</code></td>
+					<td>波特率</td>
+					<td>9600 / 19200</td>
+			</tr>
+			<tr>
+					<td><code>PARITY</code></td>
+					<td>校验：0 无，1 奇，2 偶</td>
+					<td>通常 0 或 2</td>
+			</tr>
+			<tr>
+					<td><code>FLOW_CTRL</code></td>
+					<td>流控，默认 0</td>
+					<td>0</td>
+			</tr>
+			<tr>
+					<td><code>RESP_TO</code></td>
+					<td>响应超时 (ms)</td>
+					<td>1000</td>
+			</tr>
+			<tr>
+					<td><code>MB_DB</code></td>
+					<td>关联到 <code>Modbus_Master</code>/<code>Modbus_Slave</code> 的背景 DB（用 <code>&amp;&quot;DB名&quot;</code>）</td>
+					<td>—</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p><code>MB_DB</code> 必须指向后续主/从指令的背景数据块，把串口和收发指令绑定在一起，这一步漏了会导致通讯不通。</p>
+</blockquote>
+<h3 id="23-modbus_master--作为主站">2.3 Modbus_Master —— 作为主站<a hidden class="anchor" aria-hidden="true" href="#23-modbus_master--作为主站">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">              Modbus_Master
+</span></span><span class="line"><span class="cl">            ┌────────────────────┐
+</span></span><span class="line"><span class="cl">    REQ ───►│ REQ           DONE ├──► 完成
+</span></span><span class="line"><span class="cl">      1 ───►│ MB_ADDR       BUSY ├──► 忙
+</span></span><span class="line"><span class="cl">      3 ───►│ MODE         ERROR ├──► 错误
+</span></span><span class="line"><span class="cl">      0 ───►│ DATA_ADDR    STATUS├──► 状态字
+</span></span><span class="line"><span class="cl">    100 ───►│ DATA_LEN           │
+</span></span><span class="line"><span class="cl">   P#DB ───►│ DATA_PTR           │
+</span></span><span class="line"><span class="cl">            └────────────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>REQ</code></td>
+					<td>上升沿发起一次请求（注意是<strong>边沿</strong>触发，不能常 1）</td>
+			</tr>
+			<tr>
+					<td><code>MB_ADDR</code></td>
+					<td>目标从站地址 1~247</td>
+			</tr>
+			<tr>
+					<td><code>MODE</code></td>
+					<td>读写方向：0=读，1=写（与 DATA_ADDR 一起决定功能码）</td>
+			</tr>
+			<tr>
+					<td><code>DATA_ADDR</code></td>
+					<td>Modbus 起始地址，<strong>直接填带区号的逻辑地址</strong>，如 40001、30001、00001、10001</td>
+			</tr>
+			<tr>
+					<td><code>DATA_LEN</code></td>
+					<td>读写的位数 / 字数</td>
+			</tr>
+			<tr>
+					<td><code>DATA_PTR</code></td>
+					<td>数据在 PLC 中的存放指针，指向 DB 或 M 区，如 <code>P#DB10.DBX0.0</code> 或用符号</td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>MODE / DATA_ADDR 与功能码的对应关系</strong>（西门子用这两者自动推导功能码）：</p>
+<table>
+	<thead>
+			<tr>
+					<th style="text-align: center">功能码</th>
+					<th style="text-align: center">MODE</th>
+					<th>DATA_ADDR 范围</th>
+					<th>数据长度</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: center">01 读线圈</td>
+					<td style="text-align: center">0</td>
+					<td>1 ~ 9999</td>
+					<td>1~2000 位</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">02 读离散输入</td>
+					<td style="text-align: center">0</td>
+					<td>10001 ~ 19999</td>
+					<td>1~2000 位</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">03 读保持寄存器</td>
+					<td style="text-align: center">0</td>
+					<td>40001 ~ 49999</td>
+					<td>1~125 字</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">04 读输入寄存器</td>
+					<td style="text-align: center">0</td>
+					<td>30001 ~ 39999</td>
+					<td>1~125 字</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">05/15 写线圈</td>
+					<td style="text-align: center">1</td>
+					<td>1 ~ 9999</td>
+					<td>1 或多个位</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">06/16 写保持寄存器</td>
+					<td style="text-align: center">1</td>
+					<td>40001 ~ 49999</td>
+					<td>1 或多个字</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p>在 S7-1200/1500 中 <code>DATA_ADDR</code> 用的是 <strong>40001 这种带区号的逻辑地址</strong>，指令内部会自动换算成协议地址并选功能码。这点和下面 S7-200 SMART 的 <code>Addr</code> 参数一致。</p>
+</blockquote>
+<h3 id="24-modbus_slave--作为从站">2.4 Modbus_Slave —— 作为从站<a hidden class="anchor" aria-hidden="true" href="#24-modbus_slave--作为从站">#</a></h3>
+<p>当 S7-1200/1500 需要被第三方主站（如触摸屏、上位机、另一台 PLC）轮询时使用：</p>
+<table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>MB_ADDR</code></td>
+					<td>本机从站地址</td>
+			</tr>
+			<tr>
+					<td><code>MB_HOLD_REG</code></td>
+					<td>指向作为「保持寄存器区」的 DB，外部主站读写的就是这块内存</td>
+			</tr>
+			<tr>
+					<td><code>NDR</code></td>
+					<td>新数据到达（主站写入了数据）</td>
+			</tr>
+			<tr>
+					<td><code>DR</code></td>
+					<td>数据被读取</td>
+			</tr>
+			<tr>
+					<td><code>ERROR</code> / <code>STATUS</code></td>
+					<td>错误与状态</td>
+			</tr>
+	</tbody>
+</table>
+<p>将 <code>MB_HOLD_REG</code> 指向一个<strong>非优化访问</strong>的全局 DB（需在 DB 属性里取消勾选「优化的块访问」），即可把该 DB 映射为对外的 40001 起始保持寄存器区。</p>
+<h3 id="25-多请求轮询要点">2.5 多请求轮询要点<a hidden class="anchor" aria-hidden="true" href="#25-多请求轮询要点">#</a></h3>
+<p><code>Modbus_Master</code> 同一时刻只能处理一条请求。要轮询多个从站或多种功能码，必须：</p>
+<ol>
+<li>用 <code>BUSY</code> / <code>DONE</code> 做<strong>状态机</strong>，一条完成后再发下一条；</li>
+<li>切换 <code>MB_ADDR</code>、<code>MODE</code>、<code>DATA_ADDR</code>、<code>DATA_PTR</code> 后再给 <code>REQ</code> 一个上升沿；</li>
+<li>所有读写指令共用同一个背景 DB（即都绑定到同一个 <code>Modbus_Comm_Load</code>）。</li>
+</ol>
+<p>一个简化的轮询思路（SCL 伪代码）：</p>
+<pre tabindex="0"><code class="language-pascal" data-lang="pascal">CASE step OF
+    0:  // 读 1 号站保持寄存器
+        &#34;Modbus_Master&#34;(REQ := trig, MB_ADDR := 1, MODE := 0,
+                        DATA_ADDR := 40001, DATA_LEN := 10,
+                        DATA_PTR := &#34;rdData&#34;);
+        IF &#34;Modbus_Master&#34;.DONE THEN step := 10; END_IF;
+
+    10: // 写 2 号站保持寄存器
+        &#34;Modbus_Master&#34;(REQ := trig, MB_ADDR := 2, MODE := 1,
+                        DATA_ADDR := 40001, DATA_LEN := 5,
+                        DATA_PTR := &#34;wrData&#34;);
+        IF &#34;Modbus_Master&#34;.DONE THEN step := 0; END_IF;
+END_CASE;
+</code></pre><hr>
+<h2 id="三s7-200-smart">三、S7-200 SMART<a hidden class="anchor" aria-hidden="true" href="#三s7-200-smart">#</a></h2>
+<p>S7-200 SMART 通过 CPU 本体的 <strong>RS-485 端口（Port 0）</strong> 或 <strong>SB CM01 信号板（Port 1）</strong> 通讯。指令通过 <strong>库（Library）</strong> 提供，位于 <code>指令 → 库 → Modbus RTU Master / Slave</code>，调用前需先在项目里<strong>编译一次以分配库存储区</strong>。</p>
+<h3 id="31-主站指令">3.1 主站指令<a hidden class="anchor" aria-hidden="true" href="#31-主站指令">#</a></h3>
+<p>主站需要两条指令配合：</p>
+<h4 id="mbus_ctrl--初始化每个扫描周期调用">MBUS_CTRL —— 初始化（每个扫描周期调用）<a hidden class="anchor" aria-hidden="true" href="#mbus_ctrl--初始化每个扫描周期调用">#</a></h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">            MBUS_CTRL
+</span></span><span class="line"><span class="cl">          ┌──────────────┐
+</span></span><span class="line"><span class="cl">   EN ───►│ EN           │
+</span></span><span class="line"><span class="cl">   ON ───►│ Mode    Done ├──► 初始化完成
+</span></span><span class="line"><span class="cl"> 9600 ───►│ Baud   Error ├──► 错误码
+</span></span><span class="line"><span class="cl">    2 ───►│ Parity       │
+</span></span><span class="line"><span class="cl"> 1000 ───►│ Timeout      │
+</span></span><span class="line"><span class="cl">          └──────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>Mode</code></td>
+					<td>1=启用 Modbus 协议占用端口，0=恢复为 PPI（让端口给编程口）</td>
+			</tr>
+			<tr>
+					<td><code>Baud</code></td>
+					<td>波特率</td>
+			</tr>
+			<tr>
+					<td><code>Parity</code></td>
+					<td>0 无，1 奇，2 偶</td>
+			</tr>
+			<tr>
+					<td><code>Timeout</code></td>
+					<td>等待从站应答的超时 (ms)</td>
+			</tr>
+			<tr>
+					<td><code>Done</code></td>
+					<td>初始化完成置 1</td>
+			</tr>
+			<tr>
+					<td><code>Error</code></td>
+					<td>错误码</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p><code>MBUS_CTRL</code> 必须<strong>每个扫描周期都执行</strong>（EN 端常通），不是只调一次。</p>
+</blockquote>
+<h4 id="mbus_msg--收发报文">MBUS_MSG —— 收发报文<a hidden class="anchor" aria-hidden="true" href="#mbus_msg--收发报文">#</a></h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">            MBUS_MSG
+</span></span><span class="line"><span class="cl">          ┌──────────────┐
+</span></span><span class="line"><span class="cl">  EN ────►│ EN           │
+</span></span><span class="line"><span class="cl"> First ──►│ First   Done ├──► 完成
+</span></span><span class="line"><span class="cl">    1 ───►│ Slave  Error ├──► 错误码
+</span></span><span class="line"><span class="cl">    3 ───►│ RW           │
+</span></span><span class="line"><span class="cl">40001 ───►│ Addr         │
+</span></span><span class="line"><span class="cl">   10 ───►│ Count        │
+</span></span><span class="line"><span class="cl">&amp;VB100───►│ DataPtr      │
+</span></span><span class="line"><span class="cl">          └──────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>First</code></td>
+					<td><strong>上升沿</strong>触发一次发送，关键！必须用边沿信号，不能常 1，否则会反复重发</td>
+			</tr>
+			<tr>
+					<td><code>Slave</code></td>
+					<td>从站地址</td>
+			</tr>
+			<tr>
+					<td><code>RW</code></td>
+					<td>0=读，1=写</td>
+			</tr>
+			<tr>
+					<td><code>Addr</code></td>
+					<td>Modbus 地址，填带区号逻辑地址：<code>00001</code>线圈 / <code>10001</code>离散输入 / <code>30001</code>输入寄存器 / <code>40001</code>保持寄存器</td>
+			</tr>
+			<tr>
+					<td><code>Count</code></td>
+					<td>读写数量（位或字）</td>
+			</tr>
+			<tr>
+					<td><code>DataPtr</code></td>
+					<td>数据缓冲区指针，如 <code>&amp;VB100</code></td>
+			</tr>
+			<tr>
+					<td><code>Done</code></td>
+					<td>完成置 1</td>
+			</tr>
+			<tr>
+					<td><code>Error</code></td>
+					<td>错误码</td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>多条 MBUS_MSG 轮询</strong>：同样只能逐条执行。常见做法是把多个 <code>MBUS_MSG</code> 串成轮询，用各自的 <code>Done</code> 触发下一条的 <code>First</code>，或用计数器/状态字循环切换。</p>
+<h3 id="32-从站指令">3.2 从站指令<a hidden class="anchor" aria-hidden="true" href="#32-从站指令">#</a></h3>
+<h4 id="mbus_init--从站初始化仅首次扫描调用一次">MBUS_INIT —— 从站初始化（仅首次扫描调用一次）<a hidden class="anchor" aria-hidden="true" href="#mbus_init--从站初始化仅首次扫描调用一次">#</a></h4>
+<table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>Mode</code></td>
+					<td>1=Modbus 从站，0=PPI</td>
+			</tr>
+			<tr>
+					<td><code>Addr</code></td>
+					<td>本机从站地址 1~247</td>
+			</tr>
+			<tr>
+					<td><code>Baud</code> / <code>Parity</code></td>
+					<td>波特率 / 校验</td>
+			</tr>
+			<tr>
+					<td><code>Delay</code></td>
+					<td>字符间附加延时</td>
+			</tr>
+			<tr>
+					<td><code>MaxIQ</code></td>
+					<td>可访问的 I/O 点数（0~128），一般 128</td>
+			</tr>
+			<tr>
+					<td><code>MaxAI</code></td>
+					<td>可访问的模拟量输入字数</td>
+			</tr>
+			<tr>
+					<td><code>MaxHold</code></td>
+					<td>可被主站访问的 <strong>V 区保持寄存器字数</strong></td>
+			</tr>
+			<tr>
+					<td><code>HoldStart</code></td>
+					<td>保持寄存器起始地址，如 <code>&amp;VB0</code>，对应主站读写的 40001</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p>与 <code>MBUS_CTRL</code> 不同，<code>MBUS_INIT</code> 只在 <strong>首次扫描（SM0.1）</strong> 调用一次。</p>
+</blockquote>
+<h4 id="mbus_slave--从站响应每周期调用">MBUS_SLAVE —— 从站响应（每周期调用）<a hidden class="anchor" aria-hidden="true" href="#mbus_slave--从站响应每周期调用">#</a></h4>
+<p>每个扫描周期执行，自动响应主站请求，输出 <code>Done</code>（有读写动作）与 <code>Error</code>。</p>
+<h3 id="33-s7-200-smart-从站地址映射">3.3 S7-200 SMART 从站地址映射<a hidden class="anchor" aria-hidden="true" href="#33-s7-200-smart-从站地址映射">#</a></h3>
+<p>从站模式下，外部主站访问的地址映射到 SMART 的内存：</p>
+<table>
+	<thead>
+			<tr>
+					<th>Modbus 地址</th>
+					<th>对应 SMART 区域</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>00001 起（线圈）</td>
+					<td>Q 区输出</td>
+			</tr>
+			<tr>
+					<td>10001 起（离散输入）</td>
+					<td>I 区输入</td>
+			</tr>
+			<tr>
+					<td>30001 起（输入寄存器）</td>
+					<td>AIW 模拟量输入</td>
+			</tr>
+			<tr>
+					<td>40001 起（保持寄存器）</td>
+					<td>由 <code>HoldStart</code> 指定的 V 区</td>
+			</tr>
+	</tbody>
+</table>
+<hr>
+<h2 id="四实战示例s7-1200-读取变频器频率">四、实战示例：S7-1200 读取变频器频率<a hidden class="anchor" aria-hidden="true" href="#四实战示例s7-1200-读取变频器频率">#</a></h2>
+<p>以读取某变频器（从站地址 1）的实际输出频率为例，假设手册标明：<strong>实际频率位于保持寄存器 40020，单位 0.01Hz</strong>。</p>
+<ol>
+<li><strong>OB100 启动块</strong>：调用 <code>Modbus_Comm_Load</code>，<code>PORT</code> 选 CM1241，<code>BAUD=9600</code>，<code>PARITY=2</code>（偶校验，按变频器手册），<code>MB_DB := &amp;&quot;Modbus_Master_DB&quot;</code>。</li>
+<li><strong>OB1 主程序</strong>：</li>
+</ol>
+<pre tabindex="0"><code class="language-pascal" data-lang="pascal">// 每 200ms 产生一个读取脉冲 trigRead
+&#34;Modbus_Master&#34;(REQ      := trigRead,
+                MB_ADDR  := 1,
+                MODE     := 0,          // 读
+                DATA_ADDR:= 40020,      // 保持寄存器 40020
+                DATA_LEN := 1,          // 读 1 个字
+                DATA_PTR := &#34;freqRaw&#34;); // INT 变量
+
+IF &#34;Modbus_Master&#34;.DONE THEN
+    realFreq := INT_TO_REAL(freqRaw) * 0.01;  // 换算成 Hz
+END_IF;
+</code></pre><ol start="3">
+<li>若需要写频率给定（写到 40021），把 <code>MODE</code> 改为 1、<code>DATA_ADDR := 40021</code>、<code>DATA_PTR</code> 指向给定值变量，并在读完成后再触发写。</li>
+</ol>
+<hr>
+<h2 id="五常见错误码与排查">五、常见错误码与排查<a hidden class="anchor" aria-hidden="true" href="#五常见错误码与排查">#</a></h2>
+<p>各平台 <code>STATUS / Error</code> 输出的高频错误及含义：</p>
+<table>
+	<thead>
+			<tr>
+					<th>错误现象</th>
+					<th>可能原因</th>
+					<th>排查方向</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>始终超时无应答</td>
+					<td>接线 A/B 反接、波特率/校验/从站地址不匹配</td>
+					<td>用万用表/抓包确认 A(+)、B(−)，核对参数三件套</td>
+			</tr>
+			<tr>
+					<td>CRC 校验错误</td>
+					<td>干扰、终端电阻缺失、波特率过高</td>
+					<td>加 120Ω 终端电阻、降波特率、信号线用屏蔽双绞</td>
+			</tr>
+			<tr>
+					<td>非法数据地址 (0x02)</td>
+					<td>DATA_ADDR/Addr 超出从站实际地址范围或区号错</td>
+					<td>核对手册寄存器表，注意 40001 偏移</td>
+			</tr>
+			<tr>
+					<td>非法功能 (0x01)</td>
+					<td>从站不支持该功能码</td>
+					<td>改用从站支持的功能码（如 03 与 04 别搞混）</td>
+			</tr>
+			<tr>
+					<td>间歇性丢包</td>
+					<td>多主站冲突、轮询过快、未等 Done</td>
+					<td>保证单主站、用状态机串行轮询</td>
+			</tr>
+			<tr>
+					<td>数据高低字节颠倒</td>
+					<td>字节序 / 字序（大小端）差异</td>
+					<td>对 32 位数据做字交换，或在指令/变量侧调整</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="排查口诀">排查口诀<a hidden class="anchor" aria-hidden="true" href="#排查口诀">#</a></h3>
+<ol>
+<li><strong>先通物理层</strong>：A/B 接线、共地、终端电阻、屏蔽接地。</li>
+<li><strong>再对通讯参数</strong>：波特率、数据位、校验位、停止位、从站地址，主从必须完全一致。</li>
+<li><strong>后核地址映射</strong>：功能码、寄存器地址（注意 0 偏移）、读写长度。</li>
+<li><strong>最后看时序</strong>：<code>REQ</code>/<code>First</code> 必须边沿触发；多请求用 <code>Done</code>/<code>BUSY</code> 串行轮询。</li>
+</ol>
+<hr>
+<h2 id="六两大平台指令对照表">六、两大平台指令对照表<a hidden class="anchor" aria-hidden="true" href="#六两大平台指令对照表">#</a></h2>
+<table>
+	<thead>
+			<tr>
+					<th>功能</th>
+					<th>S7-1200/1500</th>
+					<th>S7-200 SMART</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>串口/协议初始化</td>
+					<td><code>Modbus_Comm_Load</code></td>
+					<td>主站 <code>MBUS_CTRL</code> / 从站 <code>MBUS_INIT</code></td>
+			</tr>
+			<tr>
+					<td>主站收发</td>
+					<td><code>Modbus_Master</code></td>
+					<td><code>MBUS_MSG</code></td>
+			</tr>
+			<tr>
+					<td>从站响应</td>
+					<td><code>Modbus_Slave</code></td>
+					<td><code>MBUS_SLAVE</code></td>
+			</tr>
+			<tr>
+					<td>触发方式</td>
+					<td><code>REQ</code> 上升沿</td>
+					<td><code>First</code> 上升沿</td>
+			</tr>
+			<tr>
+					<td>地址填法</td>
+					<td><code>DATA_ADDR</code> 填 40001 等逻辑地址</td>
+					<td><code>Addr</code> 填 40001 等逻辑地址</td>
+			</tr>
+			<tr>
+					<td>数据指针</td>
+					<td><code>DATA_PTR</code>（P# 指针 / 符号）</td>
+					<td><code>DataPtr</code>（如 <code>&amp;VB100</code>）</td>
+			</tr>
+			<tr>
+					<td>初始化调用时机</td>
+					<td>Comm_Load 仅启动时一次</td>
+					<td>CTRL 每周期 / INIT 仅首扫一次</td>
+			</tr>
+	</tbody>
+</table>
+<hr>
+<h2 id="结语">结语<a hidden class="anchor" aria-hidden="true" href="#结语">#</a></h2>
+<p>Modbus RTU 在西门子平台上的实现并不复杂，难点几乎都集中在三处：<strong>接线与终端电阻、通讯参数一致性、寄存器地址映射（尤其是 40001 的偏移）</strong>。掌握 S7-1200/1500 的 <code>Comm_Load + Master/Slave</code> 三件套，以及 S7-200 SMART 的 <code>CTRL/INIT + MSG/SLAVE</code> 组合，再配合状态机做好多请求轮询，就能稳定地把现场仪表、变频器的数据接入 PLC。遇到不通时，按「物理层 → 通讯参数 → 地址映射 → 时序」的顺序排查，事半功倍。</p>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/">西门子</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/plc/">PLC</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/modbus/">Modbus</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/rtu/">RTU</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/%E5%B7%A5%E4%B8%9A%E9%80%9A%E8%AE%AF/">工业通讯</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/tia-portal/">TIA Portal</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+    <span class="title">下一页 »</span>
+    <span>西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/zmlgogogo">zml</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

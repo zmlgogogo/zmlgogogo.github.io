@@ -1,4 +1,6 @@
 # ZML's Blogs
 
 ## Posts
-- [Markdown 语法指南](https://zmlgogogo.github.io/posts/test/)
+- [西门子 PLC 的 Modbus (RTU) 通讯指令详解](https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/)
+- [西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV](https://zmlgogogo.github.io/posts/siemens-s7-communication/)
+- [西门子 S7-1200/1500 的 Modbus TCP 通讯详解](https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/)

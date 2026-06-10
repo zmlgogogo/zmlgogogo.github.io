@@ -7,20 +7,20 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Mon, 11 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Syntax</title>
-      <link>https://zmlgogogo.github.io/categories/syntax/</link>
-      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://zmlgogogo.github.io/categories/syntax/</guid>
+      <title>工业自动化</title>
+      <link>https://zmlgogogo.github.io/categories/%E5%B7%A5%E4%B8%9A%E8%87%AA%E5%8A%A8%E5%8C%96/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/categories/%E5%B7%A5%E4%B8%9A%E8%87%AA%E5%8A%A8%E5%8C%96/</guid>
       <description></description>
     </item>
     <item>
-      <title>Themes</title>
-      <link>https://zmlgogogo.github.io/categories/themes/</link>
-      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://zmlgogogo.github.io/categories/themes/</guid>
+      <title>通讯协议</title>
+      <link>https://zmlgogogo.github.io/categories/%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/categories/%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE/</guid>
       <description></description>
     </item>
   </channel>

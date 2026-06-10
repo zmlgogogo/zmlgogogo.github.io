@@ -7,34 +7,76 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Mon, 11 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Css</title>
-      <link>https://zmlgogogo.github.io/tags/css/</link>
-      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://zmlgogogo.github.io/tags/css/</guid>
+      <title>GET</title>
+      <link>https://zmlgogogo.github.io/tags/get/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/get/</guid>
       <description></description>
     </item>
     <item>
-      <title>Html</title>
-      <link>https://zmlgogogo.github.io/tags/html/</link>
-      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://zmlgogogo.github.io/tags/html/</guid>
+      <title>Modbus</title>
+      <link>https://zmlgogogo.github.io/tags/modbus/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/modbus/</guid>
       <description></description>
     </item>
     <item>
-      <title>Markdown</title>
-      <link>https://zmlgogogo.github.io/tags/markdown/</link>
-      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://zmlgogogo.github.io/tags/markdown/</guid>
+      <title>Modbus TCP</title>
+      <link>https://zmlgogogo.github.io/tags/modbus-tcp/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/modbus-tcp/</guid>
       <description></description>
     </item>
     <item>
-      <title>Themes</title>
-      <link>https://zmlgogogo.github.io/tags/themes/</link>
-      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://zmlgogogo.github.io/tags/themes/</guid>
+      <title>PLC</title>
+      <link>https://zmlgogogo.github.io/tags/plc/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/plc/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>PUT</title>
+      <link>https://zmlgogogo.github.io/tags/put/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/put/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RTU</title>
+      <link>https://zmlgogogo.github.io/tags/rtu/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/rtu/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>S7通讯</title>
+      <link>https://zmlgogogo.github.io/tags/s7%E9%80%9A%E8%AE%AF/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/s7%E9%80%9A%E8%AE%AF/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>TIA Portal</title>
+      <link>https://zmlgogogo.github.io/tags/tia-portal/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/tia-portal/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>工业通讯</title>
+      <link>https://zmlgogogo.github.io/tags/%E5%B7%A5%E4%B8%9A%E9%80%9A%E8%AE%AF/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/%E5%B7%A5%E4%B8%9A%E9%80%9A%E8%AE%AF/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>西门子</title>
+      <link>https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/</guid>
       <description></description>
     </item>
   </channel>

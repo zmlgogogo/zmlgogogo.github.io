@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV | ZML&#39;s Blogs</title>
+<meta name="keywords" content="西门子, PLC, S7通讯, PUT, GET, 工业通讯, TIA Portal">
+<meta name="description" content="讲解西门子 PLC 之间的 S7 通讯，涵盖 S7-1200/1500 平台下 PUT/GET 单边通讯、BSEND/BRCV 双边通讯的指令用法、连接组态、单边/双边的区别、安全访问设置与常见问题排查。">
+<meta name="author" content="ZML">
+<link rel="canonical" href="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8402523d366be05a2a71a1e346aadc28a50ae3e87baa9354b032bd5db2654f9e.css" integrity="sha256-hAJSPTZr4FoqcaHjRqrcKKUK4&#43;h7qpNUsDK9XbJlT54=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://zmlgogogo.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://zmlgogogo.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://zmlgogogo.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://zmlgogogo.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://zmlgogogo.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh-cn" href="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+  <meta property="og:site_name" content="ZML&#39;s Blogs">
+  <meta property="og:title" content="西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV">
+  <meta property="og:description" content="讲解西门子 PLC 之间的 S7 通讯，涵盖 S7-1200/1500 平台下 PUT/GET 单边通讯、BSEND/BRCV 双边通讯的指令用法、连接组态、单边/双边的区别、安全访问设置与常见问题排查。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-10T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-06-10T00:00:00+00:00">
+    <meta property="article:tag" content="西门子">
+    <meta property="article:tag" content="PLC">
+    <meta property="article:tag" content="S7通讯">
+    <meta property="article:tag" content="PUT">
+    <meta property="article:tag" content="GET">
+    <meta property="article:tag" content="工业通讯">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV">
+  <meta name="twitter:description" content="讲解西门子 PLC 之间的 S7 通讯，涵盖 S7-1200/1500 平台下 PUT/GET 单边通讯、BSEND/BRCV 双边通讯的指令用法、连接组态、单边/双边的区别、安全访问设置与常见问题排查。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://zmlgogogo.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV",
+      "item": "https://zmlgogogo.github.io/posts/siemens-s7-communication/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV",
+  "name": "西门子 S7 通讯（S7-1200\/1500）详解：PUT\/GET 与 BSEND\/BRCV",
+  "description": "讲解西门子 PLC 之间的 S7 通讯，涵盖 S7-1200/1500 平台下 PUT/GET 单边通讯、BSEND/BRCV 双边通讯的指令用法、连接组态、单边/双边的区别、安全访问设置与常见问题排查。",
+  "keywords": [
+    "西门子", "PLC", "S7通讯", "PUT", "GET", "工业通讯", "TIA Portal"
+  ],
+  "articleBody": "S7 通讯（S7 Communication）是西门子私有的、专门用于 SIMATIC 设备之间 数据交换的协议，运行在工业以太网之上。相比 Modbus 这类开放协议，S7 通讯与西门子硬件深度集成、配置简单、传输高效，是 S7-300/400/1200/1500 之间互联数据的首选方式。本文聚焦 S7-1200 / S7-1500（TIA Portal） 平台，讲解 S7 通讯的两类实现：单边通讯（PUT/GET） 与 双边通讯（BSEND/BRCV）。\n一、S7 通讯基础 1.1 什么是 S7 通讯 S7 通讯基于 ISO-on-TCP（RFC 1006），使用 TCP 端口 102，是西门子设备间的「原生语言」。它的核心特点：\n专用于 SIMATIC 设备之间（S7-1200/1500/300/400），不与第三方通用设备通讯（那是 Modbus/OUC 的活）。 通过 S7 连接 描述通讯双方，连接在「设备组态 → 网络视图」里建立。 数据直接读写对方的 DB 块，无需对方编程配合（单边模式）。 1.2 单边通讯 vs 双边通讯 这是理解 S7 通讯最关键的一对概念：\n对比项 单边通讯（PUT/GET） 双边通讯（BSEND/BRCV） 指令 PUT（写）/ GET（读） BSEND（发）/ BRCV（收） 编程位置 只在一侧（客户端）编程 双方都要编程，成对配合 对方角色 服务器，被动被读写，无需写程序 主动参与，需调用接收/发送指令 数据量 较小 较大（最高约 64KB） 握手确认 无应用层握手 有，发送/接收成对确认，可靠性高 适用平台 S7-1200/1500/300/400 S7-1500/400（1200 不支持 BSEND/BRCV 作为通讯方） 典型场景 1200 读写另一台 1200/1500 的 DB 1500↔1500/400 之间大数据、高可靠传输 S7-1200 只支持单边的 PUT/GET（且需开启权限），不支持 BSEND/BRCV。如果通讯双方都是 1200，只能用 PUT/GET。BSEND/BRCV 主要用于 S7-1500 与 S7-1500/400 之间。\n二、单边通讯：PUT / GET（S7-1200/1500） PUT/GET 是最常用的 S7 通讯方式：只在「客户端」一侧编写程序，主动读取（GET）或写入（PUT）对方「服务器」的数据块，服务器一侧无需任何通讯程序。\n指令位于指令树 通信 → S7 通信。\n2.1 前置组态：建立 S7 连接 进入 网络视图，选择「连接」模式，连接类型选 S7 连接。 从客户端 CPU 的以太网口拖拽到服务器 CPU，建立一条 S7 连接，系统分配 连接 ID（如 W#16#100）。 记下连接 ID 和伙伴的接口信息，PUT/GET 指令的 ID 参数要用到。 2.2 关键前提：开启「PUT/GET 访问权限」 这是新手最常卡住的一步。 作为服务器的 S7-1200/1500 CPU，默认禁止外部通过 PUT/GET 访问，必须手动开启：\n选中服务器 CPU → 属性 → 防护与安全（Protection \u0026 Security） → 连接机制 → 勾选 「允许来自远程对象的 PUT/GET 通信访问」。\n不勾这一项，客户端的 PUT/GET 会一直报错（连接拒绝），且报错信息不直观，极易误判。\n2.3 GET —— 读取伙伴数据 GET ┌──────────────────┐ REQ ────►│ REQ NDR ├──► 收到新数据 W#16#100───►│ ID ERROR ├──► 错误 \u0026ADDR ────►│ ADDR_1 STATUS ├──► 状态字 \u0026RD ──────►│ RD_1 │ └──────────────────┘ 参数 说明 REQ 上升沿触发一次读取 ID S7 连接 ID（与网络组态里的一致，如 W#16#100） ADDR_1 要读取的伙伴侧地址区（指针，指向对方的 DB，如 P#DB10.DBX0.0 BYTE 20） RD_1 读到的数据存放在本地的位置 NDR New Data Ready，读取成功置 1 ERROR / STATUS 错误标志 / 状态字 可用 ADDR_1ADDR_4 / RD_1RD_4 一次读取最多 4 个区域。\n2.4 PUT —— 写入伙伴数据 PUT ┌──────────────────┐ REQ ────►│ REQ DONE ├──► 完成 W#16#100───►│ ID ERROR ├──► 错误 \u0026ADDR ────►│ ADDR_1 STATUS ├──► 状态字 \u0026SD ──────►│ SD_1 │ └──────────────────┘ 参数 说明 REQ 上升沿触发一次写入 ID S7 连接 ID ADDR_1 要写入的伙伴侧地址区（指向对方 DB） SD_1 本地要发送的数据源 DONE 写入成功置 1 同样支持 ADDR_1ADDR_4 / SD_1SD_4 一次最多写 4 个区域。\n2.5 关于「优化的块访问」 被读写的 DB 如果在客户端用 绝对地址指针（P#DBx.DBXy.z） 访问，那么伙伴侧（服务器）被访问的 DB 必须设为「非优化访问」（取消勾选「优化的块访问」），否则地址无法对应。这是 PUT/GET 跨 CPU 访问的常见约束。\n2.6 PUT/GET 轮询要点 PUT 与 GET 都用 REQ 上升沿触发，不能常 1。 多个 PUT/GET 需要轮流执行时，用各自的 DONE/NDR 做状态机串行触发。 同一条 S7 连接（同一 ID）上的请求会排队，避免并发冲突。 三、双边通讯：BSEND / BRCV（S7-1500） 当需要在 S7-1500 之间传输大块数据且要求高可靠性时，使用双边通讯。它要求通讯双方都编程：发送方调用 BSEND，接收方调用 BRCV，二者通过相同的 R_ID 配对。\n指令位于 通信 → S7 通信。\n3.1 BSEND —— 发送数据（发送方） BSEND ┌──────────────────┐ REQ ────►│ REQ DONE ├──► 完成 R ────►│ R ERROR ├──► 错误 W#16#100───►│ ID STATUS ├──► 状态字 1 ──────►│ R_ID │ \u0026SD ──────►│ SD_1 │ LEN ──────►│ LEN │ └──────────────────┘ 参数 说明 REQ 上升沿触发发送 R 复位，置 1 中止当前发送 ID S7 连接 ID R_ID 通讯任务标识，必须与接收方 BRCV 的 R_ID 相同，用于配对 SD_1 要发送的数据区（指针） LEN 实际发送的数据长度（字节） DONE 接收方确认收到后置 1 3.2 BRCV —— 接收数据（接收方） BRCV ┌──────────────────┐ EN_R ──►│ EN_R NDR ├──► 收到新数据 W#16#100───►│ ID ERROR ├──► 错误 1 ──────►│ R_ID STATUS ├──► 状态字 \u0026RD ──────►│ RD_1 LEN ├──► 实收长度 └──────────────────┘ 参数 说明 EN_R 置 1 表示准备好接收 ID S7 连接 ID R_ID 必须与发送方 BSEND 的 R_ID 相同 RD_1 接收数据存放区 NDR 收到新数据置 1 LEN 实际接收到的字节数 3.3 双边通讯要点 R_ID 必须成对一致：BSEND 与 BRCV 通过相同的 R_ID 建立逻辑通道，一条连接上可有多个不同 R_ID 的通道。 双方都要编程：发送方有 BSEND，接收方必须有对应的 BRCV 在运行，否则发送方一直 BUSY/超时。 数据量大：BSEND/BRCV 单次可传输最高约 64KB，远超 PUT/GET，适合配方、批量数据。 有握手确认：BSEND 的 DONE 在接收方真正收到后才置 1，可靠性高于 PUT/GET。 四、实战示例：S7-1200 读写另一台 S7-1200 场景：PLC-A（客户端，IP 192.168.0.1）需要读取 PLC-B（服务器，IP 192.168.0.2）DB10 的 20 字节，并向 PLC-B 的 DB11 写 10 字节。\n服务器侧（PLC-B）准备：\n在「防护与安全」中勾选 「允许 PUT/GET 通信访问」。 DB10、DB11 设为非优化访问。 无需编写任何通讯程序。 客户端侧（PLC-A）编程：\n网络视图建立 A→B 的 S7 连接，记下 ID（假设 W#16#100）。 OB1 中调用 GET 与 PUT： // 每 100ms 一个脉冲 trigGet 读取 PLC-B 的 DB10 \"GET_DB\"(REQ := trigGet, ID := W#16#100, ADDR_1 := P#DB10.DBX0.0 BYTE 20, // 伙伴 PLC-B 的 DB10 RD_1 := \"rdBuf\"); // 本地接收缓冲 IF \"GET_DB\".NDR THEN // rdBuf 已更新 ; END_IF; // 读完成后触发写 trigPut，向 PLC-B 的 DB11 写 10 字节 \"PUT_DB\"(REQ := trigPut, ID := W#16#100, ADDR_1 := P#DB11.DBX0.0 BYTE 10, // 伙伴 PLC-B 的 DB11 SD_1 := \"wrBuf\"); // 本地数据源 IF \"PUT_DB\".DONE THEN ; END_IF; 五、常见问题与排查 现象 可能原因 排查方向 GET/PUT 报错、连接拒绝 服务器未开启「PUT/GET 访问权限」 服务器 CPU → 防护与安全 → 勾选允许 PUT/GET 地址访问失败 / 数据错乱 被访问 DB 是「优化访问」 把伙伴侧 DB 改为非优化访问 连接建立不上 IP 不通、连接 ID 不匹配、子网不一致 ping 测通、核对网络组态里的连接 ID BSEND 一直 BUSY 不完成 接收方无 BRCV 运行 或 R_ID 不一致 确认对方 BRCV 在跑、R_ID 两侧相同 数据只更新一次 REQ/EN_R 用了常 1 或未做边沿 GET/PUT 用上升沿触发，BRCV 的 EN_R 保持使能 S7-1200 用 BSEND 失败 1200 不支持 BSEND/BRCV 改用 PUT/GET 排查口诀 先通网络：ping 双方 IP，确认同子网、端口 102 可达。 再开权限（PUT/GET 必查）：服务器侧勾选「允许 PUT/GET 访问」。 查 DB 属性：被访问 DB 设为非优化访问。 核连接参数：连接 ID 一致；双边通讯核对 R_ID 成对相同。 看时序：REQ 边沿触发，多请求用 DONE/NDR 串行轮询。 六、S7 通讯方式对照 维度 PUT / GET（单边） BSEND / BRCV（双边） 编程侧 仅客户端一侧 发送方 + 接收方双方 对方配合 不需编程（仅开权限、设非优化 DB） 需编写对应收/发指令 数据量 小 大（约 64KB） 可靠性 无应用层握手 成对握手确认 支持平台 1200/1500/300/400 1500/400（1200 不支持） 适用场景 跨 CPU 读写少量 DB 数据 大数据、配方、高可靠传输 结语 S7 通讯是西门子设备之间最自然、最高效的互联方式。日常工程中，PUT/GET 单边通讯覆盖了绝大多数需求：只要在服务器侧勾选「允许 PUT/GET 访问」、把被访问的 DB 设为非优化，再在客户端用 GET/PUT 读写即可，对方甚至不用写一行通讯代码。只有当通讯双方都是 S7-1500/400、且需要传输大块数据并要求高可靠握手时，才用 BSEND/BRCV 双边通讯。记住两条「保命」要点 —— PUT/GET 必开访问权限、被访问 DB 必设非优化 —— 就能避开 S7 通讯里九成的坑。\n",
+  "wordCount" : "720",
+  "inLanguage": "zh-cn",
+  "datePublished": "2026-06-10T00:00:00Z",
+  "dateModified": "2026-06-10T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "ZML"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://zmlgogogo.github.io/posts/siemens-s7-communication/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ZML's Blogs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://zmlgogogo.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://zmlgogogo.github.io/" accesskey="h" title="ZML&#39;s Blogs (Alt + H)">ZML&#39;s Blogs</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://zmlgogogo.github.io/archives" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/">主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV
+    </h1>
+    <div class="post-description">
+      讲解西门子 PLC 之间的 S7 通讯，涵盖 S7-1200/1500 平台下 PUT/GET 单边通讯、BSEND/BRCV 双边通讯的指令用法、连接组态、单边/双边的区别、安全访问设置与常见问题排查。
+    </div>
+    <div class="post-meta">
+
+<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>4 分钟</span>&nbsp;·&nbsp;<span>ZML</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/zmlgogogo/zmlgogogo.github.io/posts/siemens-s7-communication.md" rel="noopener noreferrer edit" target="_blank">提出修改建议</a>
+    </span>
+
+</div>
+  </header> <details class="toc"  open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">目录</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%e4%b8%80s7-%e9%80%9a%e8%ae%af%e5%9f%ba%e7%a1%80" aria-label="一、S7 通讯基础">一、S7 通讯基础</a><ul>
+                    
+            <li>
+                <a href="#11-%e4%bb%80%e4%b9%88%e6%98%af-s7-%e9%80%9a%e8%ae%af" aria-label="1.1 什么是 S7 通讯">1.1 什么是 S7 通讯</a></li>
+            <li>
+                <a href="#12-%e5%8d%95%e8%be%b9%e9%80%9a%e8%ae%af-vs-%e5%8f%8c%e8%be%b9%e9%80%9a%e8%ae%af" aria-label="1.2 单边通讯 vs 双边通讯">1.2 单边通讯 vs 双边通讯</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%ba%8c%e5%8d%95%e8%be%b9%e9%80%9a%e8%ae%afput--gets7-12001500" aria-label="二、单边通讯：PUT / GET（S7-1200/1500）">二、单边通讯：PUT / GET（S7-1200/1500）</a><ul>
+                    
+            <li>
+                <a href="#21-%e5%89%8d%e7%bd%ae%e7%bb%84%e6%80%81%e5%bb%ba%e7%ab%8b-s7-%e8%bf%9e%e6%8e%a5" aria-label="2.1 前置组态：建立 S7 连接">2.1 前置组态：建立 S7 连接</a></li>
+            <li>
+                <a href="#22-%e5%85%b3%e9%94%ae%e5%89%8d%e6%8f%90%e5%bc%80%e5%90%afputget-%e8%ae%bf%e9%97%ae%e6%9d%83%e9%99%90" aria-label="2.2 关键前提：开启「PUT/GET 访问权限」">2.2 关键前提：开启「PUT/GET 访问权限」</a></li>
+            <li>
+                <a href="#23-get--%e8%af%bb%e5%8f%96%e4%bc%99%e4%bc%b4%e6%95%b0%e6%8d%ae" aria-label="2.3 GET —— 读取伙伴数据">2.3 GET —— 读取伙伴数据</a></li>
+            <li>
+                <a href="#24-put--%e5%86%99%e5%85%a5%e4%bc%99%e4%bc%b4%e6%95%b0%e6%8d%ae" aria-label="2.4 PUT —— 写入伙伴数据">2.4 PUT —— 写入伙伴数据</a></li>
+            <li>
+                <a href="#25-%e5%85%b3%e4%ba%8e%e4%bc%98%e5%8c%96%e7%9a%84%e5%9d%97%e8%ae%bf%e9%97%ae" aria-label="2.5 关于「优化的块访问」">2.5 关于「优化的块访问」</a></li>
+            <li>
+                <a href="#26-putget-%e8%bd%ae%e8%af%a2%e8%a6%81%e7%82%b9" aria-label="2.6 PUT/GET 轮询要点">2.6 PUT/GET 轮询要点</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%b8%89%e5%8f%8c%e8%be%b9%e9%80%9a%e8%ae%afbsend--brcvs7-1500" aria-label="三、双边通讯：BSEND / BRCV（S7-1500）">三、双边通讯：BSEND / BRCV（S7-1500）</a><ul>
+                    
+            <li>
+                <a href="#31-bsend--%e5%8f%91%e9%80%81%e6%95%b0%e6%8d%ae%e5%8f%91%e9%80%81%e6%96%b9" aria-label="3.1 BSEND —— 发送数据（发送方）">3.1 BSEND —— 发送数据（发送方）</a></li>
+            <li>
+                <a href="#32-brcv--%e6%8e%a5%e6%94%b6%e6%95%b0%e6%8d%ae%e6%8e%a5%e6%94%b6%e6%96%b9" aria-label="3.2 BRCV —— 接收数据（接收方）">3.2 BRCV —— 接收数据（接收方）</a></li>
+            <li>
+                <a href="#33-%e5%8f%8c%e8%be%b9%e9%80%9a%e8%ae%af%e8%a6%81%e7%82%b9" aria-label="3.3 双边通讯要点">3.3 双边通讯要点</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%9b%9b%e5%ae%9e%e6%88%98%e7%a4%ba%e4%be%8bs7-1200-%e8%af%bb%e5%86%99%e5%8f%a6%e4%b8%80%e5%8f%b0-s7-1200" aria-label="四、实战示例：S7-1200 读写另一台 S7-1200">四、实战示例：S7-1200 读写另一台 S7-1200</a></li>
+            <li>
+                <a href="#%e4%ba%94%e5%b8%b8%e8%a7%81%e9%97%ae%e9%a2%98%e4%b8%8e%e6%8e%92%e6%9f%a5" aria-label="五、常见问题与排查">五、常见问题与排查</a><ul>
+                    
+            <li>
+                <a href="#%e6%8e%92%e6%9f%a5%e5%8f%a3%e8%af%80" aria-label="排查口诀">排查口诀</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%85%ads7-%e9%80%9a%e8%ae%af%e6%96%b9%e5%bc%8f%e5%af%b9%e7%85%a7" aria-label="六、S7 通讯方式对照">六、S7 通讯方式对照</a></li>
+            <li>
+                <a href="#%e7%bb%93%e8%af%ad" aria-label="结语">结语</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p>S7 通讯（S7 Communication）是西门子私有的、专门用于 <strong>SIMATIC 设备之间</strong> 数据交换的协议，运行在工业以太网之上。相比 Modbus 这类开放协议，S7 通讯与西门子硬件深度集成、配置简单、传输高效，是 S7-300/400/1200/1500 之间互联数据的首选方式。本文聚焦 <strong>S7-1200 / S7-1500（TIA Portal）</strong> 平台，讲解 S7 通讯的两类实现：<strong>单边通讯（PUT/GET）</strong> 与 <strong>双边通讯（BSEND/BRCV）</strong>。</p>
+<h2 id="一s7-通讯基础">一、S7 通讯基础<a hidden class="anchor" aria-hidden="true" href="#一s7-通讯基础">#</a></h2>
+<h3 id="11-什么是-s7-通讯">1.1 什么是 S7 通讯<a hidden class="anchor" aria-hidden="true" href="#11-什么是-s7-通讯">#</a></h3>
+<p>S7 通讯基于 ISO-on-TCP（RFC 1006），使用 <strong>TCP 端口 102</strong>，是西门子设备间的「原生语言」。它的核心特点：</p>
+<ul>
+<li><strong>专用于 SIMATIC 设备之间</strong>（S7-1200/1500/300/400），不与第三方通用设备通讯（那是 Modbus/OUC 的活）。</li>
+<li>通过 <strong>S7 连接</strong> 描述通讯双方，连接在「设备组态 → 网络视图」里建立。</li>
+<li>数据直接读写对方的 <strong>DB 块</strong>，无需对方编程配合（单边模式）。</li>
+</ul>
+<h3 id="12-单边通讯-vs-双边通讯">1.2 单边通讯 vs 双边通讯<a hidden class="anchor" aria-hidden="true" href="#12-单边通讯-vs-双边通讯">#</a></h3>
+<p>这是理解 S7 通讯最关键的一对概念：</p>
+<table>
+	<thead>
+			<tr>
+					<th>对比项</th>
+					<th>单边通讯（PUT/GET）</th>
+					<th>双边通讯（BSEND/BRCV）</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>指令</td>
+					<td><code>PUT</code>（写）/ <code>GET</code>（读）</td>
+					<td><code>BSEND</code>（发）/ <code>BRCV</code>（收）</td>
+			</tr>
+			<tr>
+					<td>编程位置</td>
+					<td><strong>只在一侧（客户端）编程</strong></td>
+					<td><strong>双方都要编程</strong>，成对配合</td>
+			</tr>
+			<tr>
+					<td>对方角色</td>
+					<td>服务器，被动被读写，无需写程序</td>
+					<td>主动参与，需调用接收/发送指令</td>
+			</tr>
+			<tr>
+					<td>数据量</td>
+					<td>较小</td>
+					<td>较大（最高约 64KB）</td>
+			</tr>
+			<tr>
+					<td>握手确认</td>
+					<td>无应用层握手</td>
+					<td>有，发送/接收成对确认，可靠性高</td>
+			</tr>
+			<tr>
+					<td>适用平台</td>
+					<td>S7-1200/1500/300/400</td>
+					<td><strong>S7-1500/400</strong>（1200 不支持 BSEND/BRCV 作为通讯方）</td>
+			</tr>
+			<tr>
+					<td>典型场景</td>
+					<td>1200 读写另一台 1200/1500 的 DB</td>
+					<td>1500↔1500/400 之间大数据、高可靠传输</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p><strong>S7-1200 只支持单边的 PUT/GET</strong>（且需开启权限），不支持 BSEND/BRCV。如果通讯双方都是 1200，只能用 PUT/GET。BSEND/BRCV 主要用于 S7-1500 与 S7-1500/400 之间。</p>
+</blockquote>
+<hr>
+<h2 id="二单边通讯put--gets7-12001500">二、单边通讯：PUT / GET（S7-1200/1500）<a hidden class="anchor" aria-hidden="true" href="#二单边通讯put--gets7-12001500">#</a></h2>
+<p>PUT/GET 是最常用的 S7 通讯方式：<strong>只在「客户端」一侧编写程序</strong>，主动读取（GET）或写入（PUT）对方「服务器」的数据块，服务器一侧无需任何通讯程序。</p>
+<p>指令位于指令树 <code>通信 → S7 通信</code>。</p>
+<h3 id="21-前置组态建立-s7-连接">2.1 前置组态：建立 S7 连接<a hidden class="anchor" aria-hidden="true" href="#21-前置组态建立-s7-连接">#</a></h3>
+<ol>
+<li>进入 <strong>网络视图</strong>，选择「连接」模式，连接类型选 <strong>S7 连接</strong>。</li>
+<li>从客户端 CPU 的以太网口拖拽到服务器 CPU，建立一条 S7 连接，系统分配 <strong>连接 ID（如 W#16#100）</strong>。</li>
+<li>记下连接 ID 和伙伴的接口信息，PUT/GET 指令的 <code>ID</code> 参数要用到。</li>
+</ol>
+<h3 id="22-关键前提开启putget-访问权限">2.2 关键前提：开启「PUT/GET 访问权限」<a hidden class="anchor" aria-hidden="true" href="#22-关键前提开启putget-访问权限">#</a></h3>
+<blockquote>
+<p><strong>这是新手最常卡住的一步。</strong> 作为<strong>服务器</strong>的 S7-1200/1500 CPU，默认<strong>禁止</strong>外部通过 PUT/GET 访问，必须手动开启：</p>
+<p>选中服务器 CPU → 属性 → <strong>防护与安全（Protection &amp; Security）</strong> → 连接机制 → 勾选 <strong>「允许来自远程对象的 PUT/GET 通信访问」</strong>。</p>
+<p>不勾这一项，客户端的 PUT/GET 会一直报错（连接拒绝），且报错信息不直观，极易误判。</p>
+</blockquote>
+<h3 id="23-get--读取伙伴数据">2.3 GET —— 读取伙伴数据<a hidden class="anchor" aria-hidden="true" href="#23-get--读取伙伴数据">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">                  GET
+</span></span><span class="line"><span class="cl">            ┌──────────────────┐
+</span></span><span class="line"><span class="cl">   REQ ────►│ REQ        NDR    ├──► 收到新数据
+</span></span><span class="line"><span class="cl">W#16#100───►│ ID         ERROR  ├──► 错误
+</span></span><span class="line"><span class="cl"> &amp;ADDR ────►│ ADDR_1     STATUS ├──► 状态字
+</span></span><span class="line"><span class="cl"> &amp;RD ──────►│ RD_1              │
+</span></span><span class="line"><span class="cl">            └──────────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>REQ</code></td>
+					<td><strong>上升沿</strong>触发一次读取</td>
+			</tr>
+			<tr>
+					<td><code>ID</code></td>
+					<td>S7 连接 ID（与网络组态里的一致，如 <code>W#16#100</code>）</td>
+			</tr>
+			<tr>
+					<td><code>ADDR_1</code></td>
+					<td>要读取的<strong>伙伴侧</strong>地址区（指针，指向对方的 DB，如 <code>P#DB10.DBX0.0 BYTE 20</code>）</td>
+			</tr>
+			<tr>
+					<td><code>RD_1</code></td>
+					<td>读到的数据存放在<strong>本地</strong>的位置</td>
+			</tr>
+			<tr>
+					<td><code>NDR</code></td>
+					<td>New Data Ready，读取成功置 1</td>
+			</tr>
+			<tr>
+					<td><code>ERROR / STATUS</code></td>
+					<td>错误标志 / 状态字</td>
+			</tr>
+	</tbody>
+</table>
+<p>可用 <code>ADDR_1</code><del><code>ADDR_4</code> / <code>RD_1</code></del><code>RD_4</code> 一次读取最多 4 个区域。</p>
+<h3 id="24-put--写入伙伴数据">2.4 PUT —— 写入伙伴数据<a hidden class="anchor" aria-hidden="true" href="#24-put--写入伙伴数据">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">                  PUT
+</span></span><span class="line"><span class="cl">            ┌──────────────────┐
+</span></span><span class="line"><span class="cl">   REQ ────►│ REQ        DONE   ├──► 完成
+</span></span><span class="line"><span class="cl">W#16#100───►│ ID         ERROR  ├──► 错误
+</span></span><span class="line"><span class="cl"> &amp;ADDR ────►│ ADDR_1     STATUS ├──► 状态字
+</span></span><span class="line"><span class="cl"> &amp;SD ──────►│ SD_1              │
+</span></span><span class="line"><span class="cl">            └──────────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>REQ</code></td>
+					<td><strong>上升沿</strong>触发一次写入</td>
+			</tr>
+			<tr>
+					<td><code>ID</code></td>
+					<td>S7 连接 ID</td>
+			</tr>
+			<tr>
+					<td><code>ADDR_1</code></td>
+					<td>要写入的<strong>伙伴侧</strong>地址区（指向对方 DB）</td>
+			</tr>
+			<tr>
+					<td><code>SD_1</code></td>
+					<td><strong>本地</strong>要发送的数据源</td>
+			</tr>
+			<tr>
+					<td><code>DONE</code></td>
+					<td>写入成功置 1</td>
+			</tr>
+	</tbody>
+</table>
+<p>同样支持 <code>ADDR_1</code><del><code>ADDR_4</code> / <code>SD_1</code></del><code>SD_4</code> 一次最多写 4 个区域。</p>
+<h3 id="25-关于优化的块访问">2.5 关于「优化的块访问」<a hidden class="anchor" aria-hidden="true" href="#25-关于优化的块访问">#</a></h3>
+<p>被读写的 DB 如果在客户端用 <strong>绝对地址指针（P#DBx.DBXy.z）</strong> 访问，那么伙伴侧（服务器）被访问的 <strong>DB 必须设为「非优化访问」</strong>（取消勾选「优化的块访问」），否则地址无法对应。这是 PUT/GET 跨 CPU 访问的常见约束。</p>
+<h3 id="26-putget-轮询要点">2.6 PUT/GET 轮询要点<a hidden class="anchor" aria-hidden="true" href="#26-putget-轮询要点">#</a></h3>
+<ul>
+<li><code>PUT</code> 与 <code>GET</code> 都用 <code>REQ</code> <strong>上升沿</strong>触发，不能常 1。</li>
+<li>多个 PUT/GET 需要轮流执行时，用各自的 <code>DONE</code>/<code>NDR</code> 做状态机串行触发。</li>
+<li>同一条 S7 连接（同一 ID）上的请求会排队，避免并发冲突。</li>
+</ul>
+<hr>
+<h2 id="三双边通讯bsend--brcvs7-1500">三、双边通讯：BSEND / BRCV（S7-1500）<a hidden class="anchor" aria-hidden="true" href="#三双边通讯bsend--brcvs7-1500">#</a></h2>
+<p>当需要在 S7-1500 之间传输<strong>大块数据</strong>且要求<strong>高可靠性</strong>时，使用双边通讯。它要求<strong>通讯双方都编程</strong>：发送方调用 <code>BSEND</code>，接收方调用 <code>BRCV</code>，二者通过相同的 <strong>R_ID</strong> 配对。</p>
+<p>指令位于 <code>通信 → S7 通信</code>。</p>
+<h3 id="31-bsend--发送数据发送方">3.1 BSEND —— 发送数据（发送方）<a hidden class="anchor" aria-hidden="true" href="#31-bsend--发送数据发送方">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">                 BSEND
+</span></span><span class="line"><span class="cl">            ┌──────────────────┐
+</span></span><span class="line"><span class="cl">   REQ ────►│ REQ        DONE   ├──► 完成
+</span></span><span class="line"><span class="cl">     R ────►│ R          ERROR  ├──► 错误
+</span></span><span class="line"><span class="cl">W#16#100───►│ ID         STATUS ├──► 状态字
+</span></span><span class="line"><span class="cl">   1 ──────►│ R_ID              │
+</span></span><span class="line"><span class="cl"> &amp;SD ──────►│ SD_1              │
+</span></span><span class="line"><span class="cl"> LEN ──────►│ LEN               │
+</span></span><span class="line"><span class="cl">            └──────────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>REQ</code></td>
+					<td>上升沿触发发送</td>
+			</tr>
+			<tr>
+					<td><code>R</code></td>
+					<td>复位，置 1 中止当前发送</td>
+			</tr>
+			<tr>
+					<td><code>ID</code></td>
+					<td>S7 连接 ID</td>
+			</tr>
+			<tr>
+					<td><code>R_ID</code></td>
+					<td>通讯任务标识，<strong>必须与接收方 BRCV 的 R_ID 相同</strong>，用于配对</td>
+			</tr>
+			<tr>
+					<td><code>SD_1</code></td>
+					<td>要发送的数据区（指针）</td>
+			</tr>
+			<tr>
+					<td><code>LEN</code></td>
+					<td>实际发送的数据长度（字节）</td>
+			</tr>
+			<tr>
+					<td><code>DONE</code></td>
+					<td>接收方确认收到后置 1</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="32-brcv--接收数据接收方">3.2 BRCV —— 接收数据（接收方）<a hidden class="anchor" aria-hidden="true" href="#32-brcv--接收数据接收方">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">                 BRCV
+</span></span><span class="line"><span class="cl">            ┌──────────────────┐
+</span></span><span class="line"><span class="cl">    EN_R ──►│ EN_R       NDR    ├──► 收到新数据
+</span></span><span class="line"><span class="cl">W#16#100───►│ ID         ERROR  ├──► 错误
+</span></span><span class="line"><span class="cl">   1 ──────►│ R_ID       STATUS ├──► 状态字
+</span></span><span class="line"><span class="cl"> &amp;RD ──────►│ RD_1       LEN    ├──► 实收长度
+</span></span><span class="line"><span class="cl">            └──────────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>EN_R</code></td>
+					<td>置 1 表示准备好接收</td>
+			</tr>
+			<tr>
+					<td><code>ID</code></td>
+					<td>S7 连接 ID</td>
+			</tr>
+			<tr>
+					<td><code>R_ID</code></td>
+					<td><strong>必须与发送方 BSEND 的 R_ID 相同</strong></td>
+			</tr>
+			<tr>
+					<td><code>RD_1</code></td>
+					<td>接收数据存放区</td>
+			</tr>
+			<tr>
+					<td><code>NDR</code></td>
+					<td>收到新数据置 1</td>
+			</tr>
+			<tr>
+					<td><code>LEN</code></td>
+					<td>实际接收到的字节数</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="33-双边通讯要点">3.3 双边通讯要点<a hidden class="anchor" aria-hidden="true" href="#33-双边通讯要点">#</a></h3>
+<ol>
+<li><strong>R_ID 必须成对一致</strong>：BSEND 与 BRCV 通过相同的 <code>R_ID</code> 建立逻辑通道，一条连接上可有多个不同 R_ID 的通道。</li>
+<li><strong>双方都要编程</strong>：发送方有 BSEND，接收方必须有对应的 BRCV 在运行，否则发送方一直 BUSY/超时。</li>
+<li><strong>数据量大</strong>：BSEND/BRCV 单次可传输最高约 64KB，远超 PUT/GET，适合配方、批量数据。</li>
+<li><strong>有握手确认</strong>：BSEND 的 <code>DONE</code> 在接收方真正收到后才置 1，可靠性高于 PUT/GET。</li>
+</ol>
+<hr>
+<h2 id="四实战示例s7-1200-读写另一台-s7-1200">四、实战示例：S7-1200 读写另一台 S7-1200<a hidden class="anchor" aria-hidden="true" href="#四实战示例s7-1200-读写另一台-s7-1200">#</a></h2>
+<p>场景：PLC-A（客户端，IP <code>192.168.0.1</code>）需要读取 PLC-B（服务器，IP <code>192.168.0.2</code>）<code>DB10</code> 的 20 字节，并向 PLC-B 的 <code>DB11</code> 写 10 字节。</p>
+<p><strong>服务器侧（PLC-B）准备：</strong></p>
+<ol>
+<li>在「防护与安全」中勾选 <strong>「允许 PUT/GET 通信访问」</strong>。</li>
+<li><code>DB10</code>、<code>DB11</code> 设为<strong>非优化访问</strong>。</li>
+<li>无需编写任何通讯程序。</li>
+</ol>
+<p><strong>客户端侧（PLC-A）编程：</strong></p>
+<ol>
+<li>网络视图建立 A→B 的 <strong>S7 连接</strong>，记下 ID（假设 <code>W#16#100</code>）。</li>
+<li>OB1 中调用 GET 与 PUT：</li>
+</ol>
+<pre tabindex="0"><code class="language-pascal" data-lang="pascal">// 每 100ms 一个脉冲 trigGet 读取 PLC-B 的 DB10
+&#34;GET_DB&#34;(REQ    := trigGet,
+         ID     := W#16#100,
+         ADDR_1 := P#DB10.DBX0.0 BYTE 20,   // 伙伴 PLC-B 的 DB10
+         RD_1   := &#34;rdBuf&#34;);                 // 本地接收缓冲
+IF &#34;GET_DB&#34;.NDR THEN
+    // rdBuf 已更新
+    ;
+END_IF;
+
+// 读完成后触发写 trigPut，向 PLC-B 的 DB11 写 10 字节
+&#34;PUT_DB&#34;(REQ    := trigPut,
+         ID     := W#16#100,
+         ADDR_1 := P#DB11.DBX0.0 BYTE 10,   // 伙伴 PLC-B 的 DB11
+         SD_1   := &#34;wrBuf&#34;);                 // 本地数据源
+IF &#34;PUT_DB&#34;.DONE THEN
+    ;
+END_IF;
+</code></pre><hr>
+<h2 id="五常见问题与排查">五、常见问题与排查<a hidden class="anchor" aria-hidden="true" href="#五常见问题与排查">#</a></h2>
+<table>
+	<thead>
+			<tr>
+					<th>现象</th>
+					<th>可能原因</th>
+					<th>排查方向</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>GET/PUT 报错、连接拒绝</td>
+					<td>服务器未开启「PUT/GET 访问权限」</td>
+					<td>服务器 CPU → 防护与安全 → 勾选允许 PUT/GET</td>
+			</tr>
+			<tr>
+					<td>地址访问失败 / 数据错乱</td>
+					<td>被访问 DB 是「优化访问」</td>
+					<td>把伙伴侧 DB 改为非优化访问</td>
+			</tr>
+			<tr>
+					<td>连接建立不上</td>
+					<td>IP 不通、连接 ID 不匹配、子网不一致</td>
+					<td><code>ping</code> 测通、核对网络组态里的连接 ID</td>
+			</tr>
+			<tr>
+					<td>BSEND 一直 BUSY 不完成</td>
+					<td>接收方无 BRCV 运行 或 R_ID 不一致</td>
+					<td>确认对方 BRCV 在跑、R_ID 两侧相同</td>
+			</tr>
+			<tr>
+					<td>数据只更新一次</td>
+					<td><code>REQ</code>/<code>EN_R</code> 用了常 1 或未做边沿</td>
+					<td>GET/PUT 用上升沿触发，BRCV 的 EN_R 保持使能</td>
+			</tr>
+			<tr>
+					<td>S7-1200 用 BSEND 失败</td>
+					<td>1200 不支持 BSEND/BRCV</td>
+					<td>改用 PUT/GET</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="排查口诀">排查口诀<a hidden class="anchor" aria-hidden="true" href="#排查口诀">#</a></h3>
+<ol>
+<li><strong>先通网络</strong>：<code>ping</code> 双方 IP，确认同子网、端口 102 可达。</li>
+<li><strong>再开权限</strong>（PUT/GET 必查）：服务器侧勾选「允许 PUT/GET 访问」。</li>
+<li><strong>查 DB 属性</strong>：被访问 DB 设为非优化访问。</li>
+<li><strong>核连接参数</strong>：连接 ID 一致；双边通讯核对 <code>R_ID</code> 成对相同。</li>
+<li><strong>看时序</strong>：<code>REQ</code> 边沿触发，多请求用 <code>DONE/NDR</code> 串行轮询。</li>
+</ol>
+<hr>
+<h2 id="六s7-通讯方式对照">六、S7 通讯方式对照<a hidden class="anchor" aria-hidden="true" href="#六s7-通讯方式对照">#</a></h2>
+<table>
+	<thead>
+			<tr>
+					<th>维度</th>
+					<th>PUT / GET（单边）</th>
+					<th>BSEND / BRCV（双边）</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>编程侧</td>
+					<td>仅客户端一侧</td>
+					<td>发送方 + 接收方双方</td>
+			</tr>
+			<tr>
+					<td>对方配合</td>
+					<td>不需编程（仅开权限、设非优化 DB）</td>
+					<td>需编写对应收/发指令</td>
+			</tr>
+			<tr>
+					<td>数据量</td>
+					<td>小</td>
+					<td>大（约 64KB）</td>
+			</tr>
+			<tr>
+					<td>可靠性</td>
+					<td>无应用层握手</td>
+					<td>成对握手确认</td>
+			</tr>
+			<tr>
+					<td>支持平台</td>
+					<td>1200/1500/300/400</td>
+					<td>1500/400（1200 不支持）</td>
+			</tr>
+			<tr>
+					<td>适用场景</td>
+					<td>跨 CPU 读写少量 DB 数据</td>
+					<td>大数据、配方、高可靠传输</td>
+			</tr>
+	</tbody>
+</table>
+<hr>
+<h2 id="结语">结语<a hidden class="anchor" aria-hidden="true" href="#结语">#</a></h2>
+<p>S7 通讯是西门子设备之间最自然、最高效的互联方式。日常工程中，<strong>PUT/GET 单边通讯覆盖了绝大多数需求</strong>：只要在服务器侧勾选「允许 PUT/GET 访问」、把被访问的 DB 设为非优化，再在客户端用 GET/PUT 读写即可，对方甚至不用写一行通讯代码。只有当通讯双方都是 S7-1500/400、且需要传输大块数据并要求高可靠握手时，才用 BSEND/BRCV 双边通讯。记住两条「保命」要点 —— <strong>PUT/GET 必开访问权限、被访问 DB 必设非优化</strong> —— 就能避开 S7 通讯里九成的坑。</p>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/">西门子</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/plc/">PLC</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/s7%E9%80%9A%E8%AE%AF/">S7通讯</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/put/">PUT</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/get/">GET</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/%E5%B7%A5%E4%B8%9A%E9%80%9A%E8%AE%AF/">工业通讯</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/tia-portal/">TIA Portal</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+    <span class="title">« 上一页</span>
+    <span>西门子 PLC 的 Modbus (RTU) 通讯指令详解</span>
+  </a>
+  <a class="next" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/">
+    <span class="title">下一页 »</span>
+    <span>西门子 S7-1200/1500 的 Modbus TCP 通讯详解</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/zmlgogogo">zml</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

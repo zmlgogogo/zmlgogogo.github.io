@@ -7,14 +7,28 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Mon, 11 Mar 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Markdown 语法指南</title>
-      <link>https://zmlgogogo.github.io/posts/test/</link>
-      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
-      <guid>https://zmlgogogo.github.io/posts/test/</guid>
-      <description>展示基础 Markdown 语法以及 HTML 元素在主题中 CSS 样式效果的示例文章。</description>
+      <title>西门子 PLC 的 Modbus (RTU) 通讯指令详解</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/</guid>
+      <description>全面讲解西门子 S7-1200/1500 与 S7-200 SMART 平台下 Modbus RTU 通讯指令的用法，涵盖硬件接线、通讯组态、主站/从站指令参数、功能码、寄存器地址映射、状态错误码与实战示例。</description>
+    </item>
+    <item>
+      <title>西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-s7-communication/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-s7-communication/</guid>
+      <description>讲解西门子 PLC 之间的 S7 通讯，涵盖 S7-1200/1500 平台下 PUT/GET 单边通讯、BSEND/BRCV 双边通讯的指令用法、连接组态、单边/双边的区别、安全访问设置与常见问题排查。</description>
+    </item>
+    <item>
+      <title>西门子 S7-1200/1500 的 Modbus TCP 通讯详解</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/</guid>
+      <description>面向 S7-1200/1500（TIA Portal）平台，系统讲解 Modbus TCP 通讯的指令用法，涵盖 MB_CLIENT 客户端、MB_SERVER 服务器、连接参数 TCON_IP_v4、寄存器地址映射、多请求轮询与常见错误码排查。</description>
     </item>
   </channel>
 </rss>

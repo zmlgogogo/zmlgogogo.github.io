@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>S7通讯 on ZML&#39;s Blogs</title>
+    <link>https://zmlgogogo.github.io/tags/s7%E9%80%9A%E8%AE%AF/</link>
+    <description>Recent content in S7通讯 on ZML&#39;s Blogs</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <copyright>zml</copyright>
+    <lastBuildDate>Wed, 10 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://zmlgogogo.github.io/tags/s7%E9%80%9A%E8%AE%AF/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-s7-communication/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-s7-communication/</guid>
+      <description>讲解西门子 PLC 之间的 S7 通讯，涵盖 S7-1200/1500 平台下 PUT/GET 单边通讯、BSEND/BRCV 双边通讯的指令用法、连接组态、单边/双边的区别、安全访问设置与常见问题排查。</description>
+    </item>
+  </channel>
+</rss>

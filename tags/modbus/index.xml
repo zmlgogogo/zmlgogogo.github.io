@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Modbus on ZML&#39;s Blogs</title>
+    <link>https://zmlgogogo.github.io/tags/modbus/</link>
+    <description>Recent content in Modbus on ZML&#39;s Blogs</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <copyright>zml</copyright>
+    <lastBuildDate>Wed, 10 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://zmlgogogo.github.io/tags/modbus/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 PLC 的 Modbus (RTU) 通讯指令详解</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/</guid>
+      <description>全面讲解西门子 S7-1200/1500 与 S7-200 SMART 平台下 Modbus RTU 通讯指令的用法，涵盖硬件接线、通讯组态、主站/从站指令参数、功能码、寄存器地址映射、状态错误码与实战示例。</description>
+    </item>
+    <item>
+      <title>西门子 S7-1200/1500 的 Modbus TCP 通讯详解</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/</link>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/</guid>
+      <description>面向 S7-1200/1500（TIA Portal）平台，系统讲解 Modbus TCP 通讯的指令用法，涵盖 MB_CLIENT 客户端、MB_SERVER 服务器、连接参数 TCON_IP_v4、寄存器地址映射、多请求轮询与常见错误码排查。</description>
+    </item>
+  </channel>
+</rss>

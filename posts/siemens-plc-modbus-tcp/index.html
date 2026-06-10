@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>西门子 S7-1200/1500 的 Modbus TCP 通讯详解 | ZML&#39;s Blogs</title>
+<meta name="keywords" content="西门子, PLC, Modbus, Modbus TCP, 工业通讯, TIA Portal">
+<meta name="description" content="面向 S7-1200/1500（TIA Portal）平台，系统讲解 Modbus TCP 通讯的指令用法，涵盖 MB_CLIENT 客户端、MB_SERVER 服务器、连接参数 TCON_IP_v4、寄存器地址映射、多请求轮询与常见错误码排查。">
+<meta name="author" content="ZML">
+<link rel="canonical" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8402523d366be05a2a71a1e346aadc28a50ae3e87baa9354b032bd5db2654f9e.css" integrity="sha256-hAJSPTZr4FoqcaHjRqrcKKUK4&#43;h7qpNUsDK9XbJlT54=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://zmlgogogo.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://zmlgogogo.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://zmlgogogo.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://zmlgogogo.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://zmlgogogo.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh-cn" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/">
+  <meta property="og:site_name" content="ZML&#39;s Blogs">
+  <meta property="og:title" content="西门子 S7-1200/1500 的 Modbus TCP 通讯详解">
+  <meta property="og:description" content="面向 S7-1200/1500（TIA Portal）平台，系统讲解 Modbus TCP 通讯的指令用法，涵盖 MB_CLIENT 客户端、MB_SERVER 服务器、连接参数 TCON_IP_v4、寄存器地址映射、多请求轮询与常见错误码排查。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-10T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-06-10T00:00:00+00:00">
+    <meta property="article:tag" content="西门子">
+    <meta property="article:tag" content="PLC">
+    <meta property="article:tag" content="Modbus">
+    <meta property="article:tag" content="Modbus TCP">
+    <meta property="article:tag" content="工业通讯">
+    <meta property="article:tag" content="TIA Portal">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="西门子 S7-1200/1500 的 Modbus TCP 通讯详解">
+  <meta name="twitter:description" content="面向 S7-1200/1500（TIA Portal）平台，系统讲解 Modbus TCP 通讯的指令用法，涵盖 MB_CLIENT 客户端、MB_SERVER 服务器、连接参数 TCON_IP_v4、寄存器地址映射、多请求轮询与常见错误码排查。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://zmlgogogo.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "西门子 S7-1200/1500 的 Modbus TCP 通讯详解",
+      "item": "https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "西门子 S7-1200/1500 的 Modbus TCP 通讯详解",
+  "name": "西门子 S7-1200\/1500 的 Modbus TCP 通讯详解",
+  "description": "面向 S7-1200/1500（TIA Portal）平台，系统讲解 Modbus TCP 通讯的指令用法，涵盖 MB_CLIENT 客户端、MB_SERVER 服务器、连接参数 TCON_IP_v4、寄存器地址映射、多请求轮询与常见错误码排查。",
+  "keywords": [
+    "西门子", "PLC", "Modbus", "Modbus TCP", "工业通讯", "TIA Portal"
+  ],
+  "articleBody": "Modbus TCP 是 Modbus 协议在以太网上的实现，把原本运行于 RS-485/RS-232 的 Modbus 报文封装进 TCP/IP，借助以太网实现更高速率、更长距离和更灵活的组网。本文聚焦 S7-1200 / S7-1500（TIA Portal） 平台，系统讲解 Modbus TCP 的指令用法、连接组态与实战要点。S7-200 SMART 不在本文范围内。\n一、Modbus TCP 基础 1.1 与 Modbus RTU 的区别 Modbus TCP 与 RTU 的数据模型（线圈、寄存器、功能码）完全一致，差别在于传输层封装：\n对比项 Modbus RTU Modbus TCP 物理/链路层 RS-485 / RS-232 串行 以太网 TCP/IP 寻址方式 从站地址 1~247 IP 地址 + 端口 502 校验 CRC 16 由 TCP 保证，无 CRC 报文头 无 多 7 字节 MBAP 头 速率 通常 ≤115200 bps 10/100 Mbps 起 拓扑 单主多从、半双工总线 交换式以太网、多客户端并发 1.2 MBAP 报文头 Modbus TCP 用 7 字节的 MBAP（Modbus Application Protocol）头 取代了 RTU 的 CRC：\n字段 字节数 说明 事务标识 Transaction ID 2 请求/应答配对，由客户端递增 协议标识 Protocol ID 2 Modbus 固定为 0 长度 Length 2 后续字节数 单元标识 Unit ID 1 类似从站地址，网关后挂串行设备时用，直连设备常为 1 或 255 后面紧跟功能码与数据，与 RTU 相同。\n1.3 功能码与地址模型 功能码、四类数据区、以及「40001 偏移」陷阱与 Modbus RTU 完全一致，这里仅快速回顾：\n数据区 逻辑地址 功能码 线圈 Coils 00001 ~ 01 / 05 / 15 离散输入 Discrete Inputs 10001 ~ 02 输入寄存器 Input Registers 30001 ~ 04 保持寄存器 Holding Registers 40001 ~ 03 / 06 / 16 协议地址从 0 开始，手册的「40001」对应协议地址 0。S7-1200/1500 的 Modbus TCP 指令中，MB_DATA_ADDR 同样直接填 40001 这类逻辑地址。\n二、S7-1200/1500 的两条核心指令 Modbus TCP 不需要额外的通讯模块，直接用 CPU 本体或 CP 模块的**以太网口（PROFINET 口）**即可。指令位于指令树 通信 → 其他 → MODBUS TCP：\nMB_CLIENT：作为 Modbus TCP 客户端（主站），主动连接服务器并读写数据。 MB_SERVER：作为 Modbus TCP 服务器（从站），被动响应外部客户端的请求。 两条指令都需要一个 TCON_IP_v4 类型的连接参数结构来描述连接。\n2.1 连接参数 TCON_IP_v4 在 DB 中建一个 TCON_IP_v4 类型的变量，关键字段：\n字段 说明 InterfaceId 本地以太网接口的硬件标识符（从系统常量选，如 Local~PROFINET_Interface_1） ID 连接 ID，每个连接唯一（1~4095），不能与其他通讯连接冲突 ConnectionType 连接类型，Modbus TCP 固定 16#0B（11） ActiveEstablished 客户端置 TRUE（主动建立），服务器置 FALSE（被动监听） RemoteAddress.ADDR 远程设备 IP，4 字节数组，如 192.168.0.10 RemotePort 远程端口，Modbus 标准为 502（客户端用） LocalPort 本地端口，服务器用 502，客户端填 0（自动分配） 2.2 MB_CLIENT —— 作为客户端（主站） MB_CLIENT ┌──────────────────────┐ REQ ────►│ REQ DONE ├──► 完成 DISCONNECT─►│ DISCONNECT BUSY ├──► 忙 0 ─────►│ MB_MODE ERROR├──► 错误 40001 ─────►│ MB_DATA_ADDR STATUS├──► 状态字 10 ─────►│ MB_DATA_LEN │ P#DB ─────►│ MB_DATA_PTR │ \u0026CONN ────►│ CONNECT │ └──────────────────────┘ 参数 说明 REQ 上升沿触发一次请求 DISCONNECT 0=建立并保持连接，1=断开连接 MB_MODE 模式：0=读，1=写，2=诊断（与地址一起决定功能码） MB_DATA_ADDR Modbus 起始地址，填 40001 / 30001 / 00001 / 10001 等逻辑地址 MB_DATA_LEN 读写数据长度（位或字） MB_DATA_PTR PLC 侧数据存放区指针（指向 DB 或 M 区） CONNECT 指向 TCON_IP_v4 连接参数（用 \u0026\"DB名\".连接变量） DONE / BUSY / ERROR / STATUS 完成 / 忙 / 错误 / 状态字 MB_MODE 与 MB_DATA_ADDR 决定功能码：\n功能码 MB_MODE MB_DATA_ADDR 01 读线圈 0 1 ~ 9999 02 读离散输入 0 10001 ~ 19999 03 读保持寄存器 0 40001 ~ 49999 04 读输入寄存器 0 30001 ~ 39999 05/15 写线圈 1 1 ~ 9999 06/16 写保持寄存器 1 40001 ~ 49999 同一个 MB_CLIENT 背景 DB 对应一条连接。DISCONNECT 保持 0 时连接会一直保持，适合频繁轮询；只有需要主动释放连接时才置 1。\n2.3 MB_SERVER —— 作为服务器（从站） 当 S7-1200/1500 需要被上位机、SCADA 或第三方主站轮询时使用：\nMB_SERVER ┌──────────────────────┐ DISCONNECT─►│ DISCONNECT NDR ├──► 收到新数据（被写入） \u0026HOLD ────►│ MB_HOLD_REG DR ├──► 数据被读取 \u0026CONN ────►│ CONNECT ERROR├──► 错误 │ STATUS├──► 状态字 └──────────────────────┘ 参数 说明 DISCONNECT 0=被动监听并接受连接，1=断开 MB_HOLD_REG 作为「保持寄存器区」的 DB 或 M 区，外部客户端读写的就是这块内存，映射为 40001 起始 CONNECT 指向 TCON_IP_v4，ActiveEstablished := FALSE、LocalPort := 502 NDR New Data Ready，客户端写入了新数据时为 1 DR Data Read，数据被客户端读取时为 1 要点：\nMB_HOLD_REG 指向的 DB 要设为非优化访问（取消勾选「优化的块访问」）。 服务器端 CONNECT 的 ActiveEstablished 必须为 FALSE，LocalPort 设为 502。 一个 MB_SERVER 实例服务一个连接；要支持多个客户端并发，需用多个背景 DB + 多个不同 ID 的连接。 2.4 多请求 / 多服务器轮询 和 RTU 一样，MB_CLIENT 同一连接同一时刻只能处理一条请求，要轮询多种功能码或多台服务器：\n轮询同一台服务器的不同寄存器：复用同一背景 DB 与连接，用 DONE/BUSY 做状态机，切换 MB_MODE/MB_DATA_ADDR/MB_DATA_PTR 后再发 REQ。 轮询多台服务器：每台一个 MB_CLIENT 背景 DB + 独立连接 ID + 独立 TCON_IP_v4（不同 RemoteAddress）。 SCL 伪代码（单连接、两条请求轮询）：\nCASE step OF 0: // 读保持寄存器 \"MB_CLIENT_DB\"(REQ := trig, DISCONNECT := 0, MB_MODE := 0, MB_DATA_ADDR := 40001, MB_DATA_LEN := 10, MB_DATA_PTR := \"rdData\", CONNECT := \"conn\".srv1); IF \"MB_CLIENT_DB\".DONE THEN step := 10; END_IF; 10: // 写保持寄存器 \"MB_CLIENT_DB\"(REQ := trig, DISCONNECT := 0, MB_MODE := 1, MB_DATA_ADDR := 40020, MB_DATA_LEN := 5, MB_DATA_PTR := \"wrData\", CONNECT := \"conn\".srv1); IF \"MB_CLIENT_DB\".DONE THEN step := 0; END_IF; END_CASE; 三、实战示例：S7-1200 读取远程 IO 模块 假设有一台 Modbus TCP 远程 IO 模块，IP 192.168.0.10，端口 502，其 16 路模拟量输入位于保持寄存器 40001~40016。\n建连接参数：在 DB（如 ConnData）中建 TCON_IP_v4 变量 srv1： InterfaceId 选本地 PN 口；ID := 1；ConnectionType := 16#0B； ActiveEstablished := TRUE；RemoteAddress.ADDR := [192,168,0,10]；RemotePort := 502。 建数据区：DB 中建 aiData : Array[0..15] of Int。 OB1 调用： // 每 100ms 产生读取脉冲 trigRead \"MB_CLIENT_DB\"(REQ := trigRead, DISCONNECT := 0, MB_MODE := 0, // 读 MB_DATA_ADDR := 40001, // 保持寄存器起始 MB_DATA_LEN := 16, // 16 个字 MB_DATA_PTR := \"DB_Data\".aiData, CONNECT := \"ConnData\".srv1); IF \"MB_CLIENT_DB\".DONE THEN // aiData[] 中即为 16 路最新数据 ; END_IF; 写输出同理：把 MB_MODE := 1、MB_DATA_ADDR 指向目标保持寄存器、MB_DATA_PTR 指向写缓冲，读完成后再触发写。 四、常见错误码与排查 STATUS 输出（16 进制）的高频值与排查方向：\nSTATUS / 现象 含义 排查方向 0x7000 无作业执行（空闲） 正常，REQ 未触发 0x7001/0x7002 正在建立连接 / 正在处理 正常过渡态，等待 DONE 0x8187 CONNECT 参数无效 检查 TCON_IP_v4 各字段、连接 ID 是否冲突 0x80C4 连接被对方拒绝/中断 确认对方设备开启 502 端口、网络可达 0x80B3/0x8382 端口/连接资源冲突 连接 ID、LocalPort 是否与其他连接重复 连接超时无应答 IP/端口错、网络不通、防火墙 ping 测通、核对 IP 与端口 502 非法数据地址 (0x02) 地址超范围或区号错 核对寄存器表，注意 40001 偏移 数据高低字颠倒 字节序/字序差异 32 位数据做字交换 排查口诀 先通网络：用 ping 确认 IP 可达，确认对方 502 端口开放、无防火墙拦截。 再查连接参数：InterfaceId、连接 ID 唯一、ConnectionType=16#0B、客户端 ActiveEstablished=TRUE、RemotePort=502。 后核地址映射：功能码、寄存器地址（40001 偏移）、读写长度、Unit ID（经网关时）。 最后看时序：REQ 边沿触发，多请求用 DONE/BUSY 串行轮询；DISCONNECT 保持 0 维持长连接。 五、Modbus TCP 与 RTU 指令对照 功能 Modbus RTU Modbus TCP 串口/连接初始化 Modbus_Comm_Load 无需，连接参数由 TCON_IP_v4 描述 主站/客户端 Modbus_Master MB_CLIENT 从站/服务器 Modbus_Slave MB_SERVER 寻址 从站地址 MB_ADDR IP + 端口 + Unit ID 触发 REQ 上升沿 REQ 上升沿 读写方向 MODE (0/1) MB_MODE (0/1/2) 地址参数 DATA_ADDR 填 40001 等 MB_DATA_ADDR 填 40001 等 数据指针 DATA_PTR MB_DATA_PTR 结语 S7-1200/1500 的 Modbus TCP 实现比 RTU 更省事：不需要通讯模块和串口初始化，只要配好一个 TCON_IP_v4 连接参数，再用 MB_CLIENT（客户端）或 MB_SERVER（服务器）收发即可。难点主要集中在连接参数的正确填写（连接 ID 唯一、客户端/服务器的 ActiveEstablished 与端口区别）与一如既往的寄存器地址映射。遇到不通时，按「网络 ping 通 → 连接参数 → 地址映射 → 时序」的顺序排查，问题大多能很快定位。\n",
+  "wordCount" : "798",
+  "inLanguage": "zh-cn",
+  "datePublished": "2026-06-10T00:00:00Z",
+  "dateModified": "2026-06-10T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "ZML"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ZML's Blogs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://zmlgogogo.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://zmlgogogo.github.io/" accesskey="h" title="ZML&#39;s Blogs (Alt + H)">ZML&#39;s Blogs</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://zmlgogogo.github.io/archives" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/">主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      西门子 S7-1200/1500 的 Modbus TCP 通讯详解
+    </h1>
+    <div class="post-description">
+      面向 S7-1200/1500（TIA Portal）平台，系统讲解 Modbus TCP 通讯的指令用法，涵盖 MB_CLIENT 客户端、MB_SERVER 服务器、连接参数 TCON_IP_v4、寄存器地址映射、多请求轮询与常见错误码排查。
+    </div>
+    <div class="post-meta">
+
+<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>4 分钟</span>&nbsp;·&nbsp;<span>ZML</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/zmlgogogo/zmlgogogo.github.io/posts/siemens-plc-modbus-tcp.md" rel="noopener noreferrer edit" target="_blank">提出修改建议</a>
+    </span>
+
+</div>
+  </header> <details class="toc"  open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">目录</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%e4%b8%80modbus-tcp-%e5%9f%ba%e7%a1%80" aria-label="一、Modbus TCP 基础">一、Modbus TCP 基础</a><ul>
+                    
+            <li>
+                <a href="#11-%e4%b8%8e-modbus-rtu-%e7%9a%84%e5%8c%ba%e5%88%ab" aria-label="1.1 与 Modbus RTU 的区别">1.1 与 Modbus RTU 的区别</a></li>
+            <li>
+                <a href="#12-mbap-%e6%8a%a5%e6%96%87%e5%a4%b4" aria-label="1.2 MBAP 报文头">1.2 MBAP 报文头</a></li>
+            <li>
+                <a href="#13-%e5%8a%9f%e8%83%bd%e7%a0%81%e4%b8%8e%e5%9c%b0%e5%9d%80%e6%a8%a1%e5%9e%8b" aria-label="1.3 功能码与地址模型">1.3 功能码与地址模型</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%ba%8cs7-12001500-%e7%9a%84%e4%b8%a4%e6%9d%a1%e6%a0%b8%e5%bf%83%e6%8c%87%e4%bb%a4" aria-label="二、S7-1200/1500 的两条核心指令">二、S7-1200/1500 的两条核心指令</a><ul>
+                    
+            <li>
+                <a href="#21-%e8%bf%9e%e6%8e%a5%e5%8f%82%e6%95%b0-tcon_ip_v4" aria-label="2.1 连接参数 TCON_IP_v4">2.1 连接参数 TCON_IP_v4</a></li>
+            <li>
+                <a href="#22-mb_client--%e4%bd%9c%e4%b8%ba%e5%ae%a2%e6%88%b7%e7%ab%af%e4%b8%bb%e7%ab%99" aria-label="2.2 MB_CLIENT —— 作为客户端（主站）">2.2 MB_CLIENT —— 作为客户端（主站）</a></li>
+            <li>
+                <a href="#23-mb_server--%e4%bd%9c%e4%b8%ba%e6%9c%8d%e5%8a%a1%e5%99%a8%e4%bb%8e%e7%ab%99" aria-label="2.3 MB_SERVER —— 作为服务器（从站）">2.3 MB_SERVER —— 作为服务器（从站）</a></li>
+            <li>
+                <a href="#24-%e5%a4%9a%e8%af%b7%e6%b1%82--%e5%a4%9a%e6%9c%8d%e5%8a%a1%e5%99%a8%e8%bd%ae%e8%af%a2" aria-label="2.4 多请求 / 多服务器轮询">2.4 多请求 / 多服务器轮询</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%b8%89%e5%ae%9e%e6%88%98%e7%a4%ba%e4%be%8bs7-1200-%e8%af%bb%e5%8f%96%e8%bf%9c%e7%a8%8b-io-%e6%a8%a1%e5%9d%97" aria-label="三、实战示例：S7-1200 读取远程 IO 模块">三、实战示例：S7-1200 读取远程 IO 模块</a></li>
+            <li>
+                <a href="#%e5%9b%9b%e5%b8%b8%e8%a7%81%e9%94%99%e8%af%af%e7%a0%81%e4%b8%8e%e6%8e%92%e6%9f%a5" aria-label="四、常见错误码与排查">四、常见错误码与排查</a><ul>
+                    
+            <li>
+                <a href="#%e6%8e%92%e6%9f%a5%e5%8f%a3%e8%af%80" aria-label="排查口诀">排查口诀</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%ba%94modbus-tcp-%e4%b8%8e-rtu-%e6%8c%87%e4%bb%a4%e5%af%b9%e7%85%a7" aria-label="五、Modbus TCP 与 RTU 指令对照">五、Modbus TCP 与 RTU 指令对照</a></li>
+            <li>
+                <a href="#%e7%bb%93%e8%af%ad" aria-label="结语">结语</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p>Modbus TCP 是 Modbus 协议在以太网上的实现，把原本运行于 RS-485/RS-232 的 Modbus 报文封装进 TCP/IP，借助以太网实现更高速率、更长距离和更灵活的组网。本文聚焦 <strong>S7-1200 / S7-1500（TIA Portal）</strong> 平台，系统讲解 Modbus TCP 的指令用法、连接组态与实战要点。S7-200 SMART 不在本文范围内。</p>
+<h2 id="一modbus-tcp-基础">一、Modbus TCP 基础<a hidden class="anchor" aria-hidden="true" href="#一modbus-tcp-基础">#</a></h2>
+<h3 id="11-与-modbus-rtu-的区别">1.1 与 Modbus RTU 的区别<a hidden class="anchor" aria-hidden="true" href="#11-与-modbus-rtu-的区别">#</a></h3>
+<p>Modbus TCP 与 RTU 的数据模型（线圈、寄存器、功能码）完全一致，差别在于<strong>传输层封装</strong>：</p>
+<table>
+	<thead>
+			<tr>
+					<th>对比项</th>
+					<th>Modbus RTU</th>
+					<th>Modbus TCP</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>物理/链路层</td>
+					<td>RS-485 / RS-232 串行</td>
+					<td>以太网 TCP/IP</td>
+			</tr>
+			<tr>
+					<td>寻址方式</td>
+					<td>从站地址 1~247</td>
+					<td>IP 地址 + 端口 502</td>
+			</tr>
+			<tr>
+					<td>校验</td>
+					<td>CRC 16</td>
+					<td>由 TCP 保证，<strong>无 CRC</strong></td>
+			</tr>
+			<tr>
+					<td>报文头</td>
+					<td>无</td>
+					<td>多 7 字节 MBAP 头</td>
+			</tr>
+			<tr>
+					<td>速率</td>
+					<td>通常 ≤115200 bps</td>
+					<td>10/100 Mbps 起</td>
+			</tr>
+			<tr>
+					<td>拓扑</td>
+					<td>单主多从、半双工总线</td>
+					<td>交换式以太网、多客户端并发</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="12-mbap-报文头">1.2 MBAP 报文头<a hidden class="anchor" aria-hidden="true" href="#12-mbap-报文头">#</a></h3>
+<p>Modbus TCP 用 7 字节的 <strong>MBAP（Modbus Application Protocol）头</strong> 取代了 RTU 的 CRC：</p>
+<table>
+	<thead>
+			<tr>
+					<th>字段</th>
+					<th style="text-align: center">字节数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>事务标识 Transaction ID</td>
+					<td style="text-align: center">2</td>
+					<td>请求/应答配对，由客户端递增</td>
+			</tr>
+			<tr>
+					<td>协议标识 Protocol ID</td>
+					<td style="text-align: center">2</td>
+					<td>Modbus 固定为 0</td>
+			</tr>
+			<tr>
+					<td>长度 Length</td>
+					<td style="text-align: center">2</td>
+					<td>后续字节数</td>
+			</tr>
+			<tr>
+					<td>单元标识 Unit ID</td>
+					<td style="text-align: center">1</td>
+					<td>类似从站地址，网关后挂串行设备时用，直连设备常为 1 或 255</td>
+			</tr>
+	</tbody>
+</table>
+<p>后面紧跟功能码与数据，与 RTU 相同。</p>
+<h3 id="13-功能码与地址模型">1.3 功能码与地址模型<a hidden class="anchor" aria-hidden="true" href="#13-功能码与地址模型">#</a></h3>
+<p>功能码、四类数据区、以及「40001 偏移」陷阱与 Modbus RTU 完全一致，这里仅快速回顾：</p>
+<table>
+	<thead>
+			<tr>
+					<th>数据区</th>
+					<th>逻辑地址</th>
+					<th>功能码</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>线圈 Coils</td>
+					<td>00001 ~</td>
+					<td>01 / 05 / 15</td>
+			</tr>
+			<tr>
+					<td>离散输入 Discrete Inputs</td>
+					<td>10001 ~</td>
+					<td>02</td>
+			</tr>
+			<tr>
+					<td>输入寄存器 Input Registers</td>
+					<td>30001 ~</td>
+					<td>04</td>
+			</tr>
+			<tr>
+					<td>保持寄存器 Holding Registers</td>
+					<td>40001 ~</td>
+					<td>03 / 06 / 16</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p>协议地址从 0 开始，手册的「40001」对应协议地址 0。S7-1200/1500 的 Modbus TCP 指令中，<code>MB_DATA_ADDR</code> 同样直接填 <strong>40001 这类逻辑地址</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="二s7-12001500-的两条核心指令">二、S7-1200/1500 的两条核心指令<a hidden class="anchor" aria-hidden="true" href="#二s7-12001500-的两条核心指令">#</a></h2>
+<p>Modbus TCP 不需要额外的通讯模块，直接用 CPU 本体或 CP 模块的**以太网口（PROFINET 口）**即可。指令位于指令树 <code>通信 → 其他 → MODBUS TCP</code>：</p>
+<ul>
+<li><strong><code>MB_CLIENT</code></strong>：作为 Modbus TCP <strong>客户端（主站）</strong>，主动连接服务器并读写数据。</li>
+<li><strong><code>MB_SERVER</code></strong>：作为 Modbus TCP <strong>服务器（从站）</strong>，被动响应外部客户端的请求。</li>
+</ul>
+<p>两条指令都需要一个 <strong><code>TCON_IP_v4</code></strong> 类型的连接参数结构来描述连接。</p>
+<h3 id="21-连接参数-tcon_ip_v4">2.1 连接参数 TCON_IP_v4<a hidden class="anchor" aria-hidden="true" href="#21-连接参数-tcon_ip_v4">#</a></h3>
+<p>在 DB 中建一个 <code>TCON_IP_v4</code> 类型的变量，关键字段：</p>
+<table>
+	<thead>
+			<tr>
+					<th>字段</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>InterfaceId</code></td>
+					<td>本地以太网接口的硬件标识符（从系统常量选，如 <code>Local~PROFINET_Interface_1</code>）</td>
+			</tr>
+			<tr>
+					<td><code>ID</code></td>
+					<td>连接 ID，<strong>每个连接唯一</strong>（1~4095），不能与其他通讯连接冲突</td>
+			</tr>
+			<tr>
+					<td><code>ConnectionType</code></td>
+					<td>连接类型，Modbus TCP 固定 <code>16#0B</code>（11）</td>
+			</tr>
+			<tr>
+					<td><code>ActiveEstablished</code></td>
+					<td>客户端置 <code>TRUE</code>（主动建立），服务器置 <code>FALSE</code>（被动监听）</td>
+			</tr>
+			<tr>
+					<td><code>RemoteAddress.ADDR</code></td>
+					<td>远程设备 IP，4 字节数组，如 <code>192.168.0.10</code></td>
+			</tr>
+			<tr>
+					<td><code>RemotePort</code></td>
+					<td>远程端口，Modbus 标准为 <strong>502</strong>（客户端用）</td>
+			</tr>
+			<tr>
+					<td><code>LocalPort</code></td>
+					<td>本地端口，<strong>服务器用 502</strong>，客户端填 0（自动分配）</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="22-mb_client--作为客户端主站">2.2 MB_CLIENT —— 作为客户端（主站）<a hidden class="anchor" aria-hidden="true" href="#22-mb_client--作为客户端主站">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">                MB_CLIENT
+</span></span><span class="line"><span class="cl">            ┌──────────────────────┐
+</span></span><span class="line"><span class="cl">   REQ ────►│ REQ              DONE ├──► 完成
+</span></span><span class="line"><span class="cl">DISCONNECT─►│ DISCONNECT       BUSY ├──► 忙
+</span></span><span class="line"><span class="cl">    0 ─────►│ MB_MODE         ERROR├──► 错误
+</span></span><span class="line"><span class="cl">40001 ─────►│ MB_DATA_ADDR   STATUS├──► 状态字
+</span></span><span class="line"><span class="cl">   10 ─────►│ MB_DATA_LEN          │
+</span></span><span class="line"><span class="cl"> P#DB ─────►│ MB_DATA_PTR          │
+</span></span><span class="line"><span class="cl"> &amp;CONN ────►│ CONNECT              │
+</span></span><span class="line"><span class="cl">            └──────────────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>REQ</code></td>
+					<td><strong>上升沿</strong>触发一次请求</td>
+			</tr>
+			<tr>
+					<td><code>DISCONNECT</code></td>
+					<td>0=建立并保持连接，1=断开连接</td>
+			</tr>
+			<tr>
+					<td><code>MB_MODE</code></td>
+					<td>模式：0=读，1=写，2=诊断（与地址一起决定功能码）</td>
+			</tr>
+			<tr>
+					<td><code>MB_DATA_ADDR</code></td>
+					<td>Modbus 起始地址，填 40001 / 30001 / 00001 / 10001 等逻辑地址</td>
+			</tr>
+			<tr>
+					<td><code>MB_DATA_LEN</code></td>
+					<td>读写数据长度（位或字）</td>
+			</tr>
+			<tr>
+					<td><code>MB_DATA_PTR</code></td>
+					<td>PLC 侧数据存放区指针（指向 DB 或 M 区）</td>
+			</tr>
+			<tr>
+					<td><code>CONNECT</code></td>
+					<td>指向 <code>TCON_IP_v4</code> 连接参数（用 <code>&amp;&quot;DB名&quot;.连接变量</code>）</td>
+			</tr>
+			<tr>
+					<td><code>DONE / BUSY / ERROR / STATUS</code></td>
+					<td>完成 / 忙 / 错误 / 状态字</td>
+			</tr>
+	</tbody>
+</table>
+<p><strong>MB_MODE 与 MB_DATA_ADDR 决定功能码</strong>：</p>
+<table>
+	<thead>
+			<tr>
+					<th style="text-align: center">功能码</th>
+					<th style="text-align: center">MB_MODE</th>
+					<th>MB_DATA_ADDR</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: center">01 读线圈</td>
+					<td style="text-align: center">0</td>
+					<td>1 ~ 9999</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">02 读离散输入</td>
+					<td style="text-align: center">0</td>
+					<td>10001 ~ 19999</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">03 读保持寄存器</td>
+					<td style="text-align: center">0</td>
+					<td>40001 ~ 49999</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">04 读输入寄存器</td>
+					<td style="text-align: center">0</td>
+					<td>30001 ~ 39999</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">05/15 写线圈</td>
+					<td style="text-align: center">1</td>
+					<td>1 ~ 9999</td>
+			</tr>
+			<tr>
+					<td style="text-align: center">06/16 写保持寄存器</td>
+					<td style="text-align: center">1</td>
+					<td>40001 ~ 49999</td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p>同一个 <code>MB_CLIENT</code> 背景 DB 对应<strong>一条连接</strong>。<code>DISCONNECT</code> 保持 0 时连接会一直保持，适合频繁轮询；只有需要主动释放连接时才置 1。</p>
+</blockquote>
+<h3 id="23-mb_server--作为服务器从站">2.3 MB_SERVER —— 作为服务器（从站）<a hidden class="anchor" aria-hidden="true" href="#23-mb_server--作为服务器从站">#</a></h3>
+<p>当 S7-1200/1500 需要被上位机、SCADA 或第三方主站轮询时使用：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">                MB_SERVER
+</span></span><span class="line"><span class="cl">            ┌──────────────────────┐
+</span></span><span class="line"><span class="cl">DISCONNECT─►│ DISCONNECT        NDR ├──► 收到新数据（被写入）
+</span></span><span class="line"><span class="cl"> &amp;HOLD ────►│ MB_HOLD_REG        DR ├──► 数据被读取
+</span></span><span class="line"><span class="cl"> &amp;CONN ────►│ CONNECT         ERROR├──► 错误
+</span></span><span class="line"><span class="cl">            │                 STATUS├──► 状态字
+</span></span><span class="line"><span class="cl">            └──────────────────────┘
+</span></span></code></pre></div><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>DISCONNECT</code></td>
+					<td>0=被动监听并接受连接，1=断开</td>
+			</tr>
+			<tr>
+					<td><code>MB_HOLD_REG</code></td>
+					<td>作为「保持寄存器区」的 DB 或 M 区，外部客户端读写的就是这块内存，映射为 40001 起始</td>
+			</tr>
+			<tr>
+					<td><code>CONNECT</code></td>
+					<td>指向 <code>TCON_IP_v4</code>，<code>ActiveEstablished := FALSE</code>、<code>LocalPort := 502</code></td>
+			</tr>
+			<tr>
+					<td><code>NDR</code></td>
+					<td>New Data Ready，客户端写入了新数据时为 1</td>
+			</tr>
+			<tr>
+					<td><code>DR</code></td>
+					<td>Data Read，数据被客户端读取时为 1</td>
+			</tr>
+	</tbody>
+</table>
+<p>要点：</p>
+<ol>
+<li><code>MB_HOLD_REG</code> 指向的 DB 要设为<strong>非优化访问</strong>（取消勾选「优化的块访问」）。</li>
+<li>服务器端 <code>CONNECT</code> 的 <code>ActiveEstablished</code> 必须为 <code>FALSE</code>，<code>LocalPort</code> 设为 502。</li>
+<li>一个 <code>MB_SERVER</code> 实例服务一个连接；要支持多个客户端并发，需用<strong>多个背景 DB + 多个不同 ID 的连接</strong>。</li>
+</ol>
+<h3 id="24-多请求--多服务器轮询">2.4 多请求 / 多服务器轮询<a hidden class="anchor" aria-hidden="true" href="#24-多请求--多服务器轮询">#</a></h3>
+<p>和 RTU 一样，<code>MB_CLIENT</code> 同一连接同一时刻只能处理一条请求，要轮询多种功能码或多台服务器：</p>
+<ul>
+<li>轮询<strong>同一台</strong>服务器的不同寄存器：复用同一背景 DB 与连接，用 <code>DONE/BUSY</code> 做状态机，切换 <code>MB_MODE</code>/<code>MB_DATA_ADDR</code>/<code>MB_DATA_PTR</code> 后再发 <code>REQ</code>。</li>
+<li>轮询<strong>多台</strong>服务器：每台一个 <code>MB_CLIENT</code> 背景 DB + 独立连接 ID + 独立 <code>TCON_IP_v4</code>（不同 <code>RemoteAddress</code>）。</li>
+</ul>
+<p>SCL 伪代码（单连接、两条请求轮询）：</p>
+<pre tabindex="0"><code class="language-pascal" data-lang="pascal">CASE step OF
+    0:  // 读保持寄存器
+        &#34;MB_CLIENT_DB&#34;(REQ := trig, DISCONNECT := 0, MB_MODE := 0,
+                       MB_DATA_ADDR := 40001, MB_DATA_LEN := 10,
+                       MB_DATA_PTR := &#34;rdData&#34;, CONNECT := &#34;conn&#34;.srv1);
+        IF &#34;MB_CLIENT_DB&#34;.DONE THEN step := 10; END_IF;
+
+    10: // 写保持寄存器
+        &#34;MB_CLIENT_DB&#34;(REQ := trig, DISCONNECT := 0, MB_MODE := 1,
+                       MB_DATA_ADDR := 40020, MB_DATA_LEN := 5,
+                       MB_DATA_PTR := &#34;wrData&#34;, CONNECT := &#34;conn&#34;.srv1);
+        IF &#34;MB_CLIENT_DB&#34;.DONE THEN step := 0; END_IF;
+END_CASE;
+</code></pre><hr>
+<h2 id="三实战示例s7-1200-读取远程-io-模块">三、实战示例：S7-1200 读取远程 IO 模块<a hidden class="anchor" aria-hidden="true" href="#三实战示例s7-1200-读取远程-io-模块">#</a></h2>
+<p>假设有一台 Modbus TCP 远程 IO 模块，IP <code>192.168.0.10</code>，端口 502，其 16 路模拟量输入位于<strong>保持寄存器 40001~40016</strong>。</p>
+<ol>
+<li><strong>建连接参数</strong>：在 DB（如 <code>ConnData</code>）中建 <code>TCON_IP_v4</code> 变量 <code>srv1</code>：
+<ul>
+<li><code>InterfaceId</code> 选本地 PN 口；<code>ID := 1</code>；<code>ConnectionType := 16#0B</code>；</li>
+<li><code>ActiveEstablished := TRUE</code>；<code>RemoteAddress.ADDR := [192,168,0,10]</code>；<code>RemotePort := 502</code>。</li>
+</ul>
+</li>
+<li><strong>建数据区</strong>：DB 中建 <code>aiData : Array[0..15] of Int</code>。</li>
+<li><strong>OB1 调用</strong>：</li>
+</ol>
+<pre tabindex="0"><code class="language-pascal" data-lang="pascal">// 每 100ms 产生读取脉冲 trigRead
+&#34;MB_CLIENT_DB&#34;(REQ          := trigRead,
+               DISCONNECT   := 0,
+               MB_MODE      := 0,            // 读
+               MB_DATA_ADDR := 40001,        // 保持寄存器起始
+               MB_DATA_LEN  := 16,           // 16 个字
+               MB_DATA_PTR  := &#34;DB_Data&#34;.aiData,
+               CONNECT      := &#34;ConnData&#34;.srv1);
+
+IF &#34;MB_CLIENT_DB&#34;.DONE THEN
+    // aiData[] 中即为 16 路最新数据
+    ;
+END_IF;
+</code></pre><ol start="4">
+<li>写输出同理：把 <code>MB_MODE := 1</code>、<code>MB_DATA_ADDR</code> 指向目标保持寄存器、<code>MB_DATA_PTR</code> 指向写缓冲，读完成后再触发写。</li>
+</ol>
+<hr>
+<h2 id="四常见错误码与排查">四、常见错误码与排查<a hidden class="anchor" aria-hidden="true" href="#四常见错误码与排查">#</a></h2>
+<p><code>STATUS</code> 输出（16 进制）的高频值与排查方向：</p>
+<table>
+	<thead>
+			<tr>
+					<th>STATUS / 现象</th>
+					<th>含义</th>
+					<th>排查方向</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>0x7000</code></td>
+					<td>无作业执行（空闲）</td>
+					<td>正常，<code>REQ</code> 未触发</td>
+			</tr>
+			<tr>
+					<td><code>0x7001/0x7002</code></td>
+					<td>正在建立连接 / 正在处理</td>
+					<td>正常过渡态，等待 <code>DONE</code></td>
+			</tr>
+			<tr>
+					<td><code>0x8187</code></td>
+					<td>CONNECT 参数无效</td>
+					<td>检查 <code>TCON_IP_v4</code> 各字段、连接 ID 是否冲突</td>
+			</tr>
+			<tr>
+					<td><code>0x80C4</code></td>
+					<td>连接被对方拒绝/中断</td>
+					<td>确认对方设备开启 502 端口、网络可达</td>
+			</tr>
+			<tr>
+					<td><code>0x80B3/0x8382</code></td>
+					<td>端口/连接资源冲突</td>
+					<td>连接 ID、LocalPort 是否与其他连接重复</td>
+			</tr>
+			<tr>
+					<td>连接超时无应答</td>
+					<td>IP/端口错、网络不通、防火墙</td>
+					<td><code>ping</code> 测通、核对 IP 与端口 502</td>
+			</tr>
+			<tr>
+					<td>非法数据地址 (0x02)</td>
+					<td>地址超范围或区号错</td>
+					<td>核对寄存器表，注意 40001 偏移</td>
+			</tr>
+			<tr>
+					<td>数据高低字颠倒</td>
+					<td>字节序/字序差异</td>
+					<td>32 位数据做字交换</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="排查口诀">排查口诀<a hidden class="anchor" aria-hidden="true" href="#排查口诀">#</a></h3>
+<ol>
+<li><strong>先通网络</strong>：用 <code>ping</code> 确认 IP 可达，确认对方 502 端口开放、无防火墙拦截。</li>
+<li><strong>再查连接参数</strong>：<code>InterfaceId</code>、连接 <code>ID</code> 唯一、<code>ConnectionType=16#0B</code>、客户端 <code>ActiveEstablished=TRUE</code>、<code>RemotePort=502</code>。</li>
+<li><strong>后核地址映射</strong>：功能码、寄存器地址（40001 偏移）、读写长度、<code>Unit ID</code>（经网关时）。</li>
+<li><strong>最后看时序</strong>：<code>REQ</code> 边沿触发，多请求用 <code>DONE/BUSY</code> 串行轮询；<code>DISCONNECT</code> 保持 0 维持长连接。</li>
+</ol>
+<hr>
+<h2 id="五modbus-tcp-与-rtu-指令对照">五、Modbus TCP 与 RTU 指令对照<a hidden class="anchor" aria-hidden="true" href="#五modbus-tcp-与-rtu-指令对照">#</a></h2>
+<table>
+	<thead>
+			<tr>
+					<th>功能</th>
+					<th>Modbus RTU</th>
+					<th>Modbus TCP</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>串口/连接初始化</td>
+					<td><code>Modbus_Comm_Load</code></td>
+					<td>无需，连接参数由 <code>TCON_IP_v4</code> 描述</td>
+			</tr>
+			<tr>
+					<td>主站/客户端</td>
+					<td><code>Modbus_Master</code></td>
+					<td><code>MB_CLIENT</code></td>
+			</tr>
+			<tr>
+					<td>从站/服务器</td>
+					<td><code>Modbus_Slave</code></td>
+					<td><code>MB_SERVER</code></td>
+			</tr>
+			<tr>
+					<td>寻址</td>
+					<td>从站地址 <code>MB_ADDR</code></td>
+					<td>IP + 端口 + <code>Unit ID</code></td>
+			</tr>
+			<tr>
+					<td>触发</td>
+					<td><code>REQ</code> 上升沿</td>
+					<td><code>REQ</code> 上升沿</td>
+			</tr>
+			<tr>
+					<td>读写方向</td>
+					<td><code>MODE</code> (0/1)</td>
+					<td><code>MB_MODE</code> (0/1/2)</td>
+			</tr>
+			<tr>
+					<td>地址参数</td>
+					<td><code>DATA_ADDR</code> 填 40001 等</td>
+					<td><code>MB_DATA_ADDR</code> 填 40001 等</td>
+			</tr>
+			<tr>
+					<td>数据指针</td>
+					<td><code>DATA_PTR</code></td>
+					<td><code>MB_DATA_PTR</code></td>
+			</tr>
+	</tbody>
+</table>
+<hr>
+<h2 id="结语">结语<a hidden class="anchor" aria-hidden="true" href="#结语">#</a></h2>
+<p>S7-1200/1500 的 Modbus TCP 实现比 RTU 更省事：不需要通讯模块和串口初始化，只要配好一个 <code>TCON_IP_v4</code> 连接参数，再用 <code>MB_CLIENT</code>（客户端）或 <code>MB_SERVER</code>（服务器）收发即可。难点主要集中在<strong>连接参数的正确填写（连接 ID 唯一、客户端/服务器的 ActiveEstablished 与端口区别）<strong>与一如既往的</strong>寄存器地址映射</strong>。遇到不通时，按「网络 ping 通 → 连接参数 → 地址映射 → 时序」的顺序排查，问题大多能很快定位。</p>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/">西门子</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/plc/">PLC</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/modbus/">Modbus</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/modbus-tcp/">Modbus TCP</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/%E5%B7%A5%E4%B8%9A%E9%80%9A%E8%AE%AF/">工业通讯</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/tia-portal/">TIA Portal</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+    <span class="title">« 上一页</span>
+    <span>西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/zmlgogogo">zml</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
