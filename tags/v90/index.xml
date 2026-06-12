@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>V90 on ZML&#39;s Blogs</title>
+    <link>https://zmlgogogo.github.io/tags/v90/</link>
+    <description>Recent content in V90 on ZML&#39;s Blogs</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <copyright>zml</copyright>
+    <lastBuildDate>Fri, 12 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://zmlgogogo.github.io/tags/v90/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 V90 伺服驱动调试配置全流程详解</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/</link>
+      <pubDate>Fri, 12 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/</guid>
+      <description>从接线、版本选型到 V-ASSISTANT 参数设置、JOG 试运行、控制模式（PTI/IPos/Speed）配置，以及与 S7-1200/1500 经 PROFINET 报文（标准报文 3/111）通讯组态的完整 V90 伺服调试指南。</description>
+    </item>
+  </channel>
+</rss>

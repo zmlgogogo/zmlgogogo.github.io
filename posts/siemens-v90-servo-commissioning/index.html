@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>西门子 V90 伺服驱动调试配置全流程详解 | ZML&#39;s Blogs</title>
+<meta name="keywords" content="西门子, V90, 伺服, PROFINET, 运动控制, TIA Portal">
+<meta name="description" content="从接线、版本选型到 V-ASSISTANT 参数设置、JOG 试运行、控制模式（PTI/IPos/Speed）配置，以及与 S7-1200/1500 经 PROFINET 报文（标准报文 3/111）通讯组态的完整 V90 伺服调试指南。">
+<meta name="author" content="ZML">
+<link rel="canonical" href="https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8402523d366be05a2a71a1e346aadc28a50ae3e87baa9354b032bd5db2654f9e.css" integrity="sha256-hAJSPTZr4FoqcaHjRqrcKKUK4&#43;h7qpNUsDK9XbJlT54=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://zmlgogogo.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://zmlgogogo.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://zmlgogogo.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://zmlgogogo.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://zmlgogogo.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh-cn" href="https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/">
+  <meta property="og:site_name" content="ZML&#39;s Blogs">
+  <meta property="og:title" content="西门子 V90 伺服驱动调试配置全流程详解">
+  <meta property="og:description" content="从接线、版本选型到 V-ASSISTANT 参数设置、JOG 试运行、控制模式（PTI/IPos/Speed）配置，以及与 S7-1200/1500 经 PROFINET 报文（标准报文 3/111）通讯组态的完整 V90 伺服调试指南。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-12T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-06-12T00:00:00+00:00">
+    <meta property="article:tag" content="西门子">
+    <meta property="article:tag" content="V90">
+    <meta property="article:tag" content="伺服">
+    <meta property="article:tag" content="PROFINET">
+    <meta property="article:tag" content="运动控制">
+    <meta property="article:tag" content="TIA Portal">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-s7-communication/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="西门子 V90 伺服驱动调试配置全流程详解">
+  <meta name="twitter:description" content="从接线、版本选型到 V-ASSISTANT 参数设置、JOG 试运行、控制模式（PTI/IPos/Speed）配置，以及与 S7-1200/1500 经 PROFINET 报文（标准报文 3/111）通讯组态的完整 V90 伺服调试指南。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://zmlgogogo.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "西门子 V90 伺服驱动调试配置全流程详解",
+      "item": "https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "西门子 V90 伺服驱动调试配置全流程详解",
+  "name": "西门子 V90 伺服驱动调试配置全流程详解",
+  "description": "从接线、版本选型到 V-ASSISTANT 参数设置、JOG 试运行、控制模式（PTI/IPos/Speed）配置，以及与 S7-1200/1500 经 PROFINET 报文（标准报文 3/111）通讯组态的完整 V90 伺服调试指南。",
+  "keywords": [
+    "西门子", "V90", "伺服", "PROFINET", "运动控制", "TIA Portal"
+  ],
+  "articleBody": "SINAMICS V90 是西门子面向通用运动控制的经济型伺服驱动，搭配 SIMOTICS S-1FL6 伺服电机，广泛用于定位、收放卷、贴标、包装等场合。本文按实际调试顺序，系统梳理 V90 从硬件接线 → 版本选型 → 参数设置 → 试运行 → 与 PLC 通讯组态的完整流程，覆盖脉冲（PTI）和 PROFINET（PN）两种主流版本。\n一、V90 版本与选型 V90 分为两大硬件版本，调试方式差别很大，动手前必须先确认手里是哪一种：\n版本 接口 控制方式 调试软件 V90 PTI（脉冲版） 脉冲/方向输入、模拟量 外部脉冲定位、模拟量调速、内部定位块 V-ASSISTANT V90 PN（总线版） PROFINET 经 PN 报文由 PLC 控制（位置/速度） V-ASSISTANT + TIA Portal PTI 版：靠 PLC 高速脉冲输出（PTO）发脉冲控制，或用驱动内部的 IPos 定位块。接线简单，成本低，适合简单定位。 PN 版：通过 PROFINET 与 S7-1200/1500 通讯，配合工艺对象（TO）做精确运动控制，是目前主流。本文重点讲 PN 版与 PLC 的组态。 电机与驱动还要匹配功率、电压等级（220V/400V）、是否带抱闸、编码器类型（增量/绝对值），订货号需对应。\n二、硬件接线 2.1 主回路 端子 说明 L1/L2/L3（或 L1/L2） 主电源输入，注意电压等级 220V 单相/三相 或 400V 三相 U/V/W 接伺服电机动力线，相序必须对应，接反会导致失控或报警 DCP/DCN 直流母线 / 外接制动电阻（大惯量、频繁启停时需外接） PE 保护接地，务必可靠接地，否则编码器易受干扰报警 2.2 控制与编码器 编码器线：连接电机编码器到驱动 X9（注意增量式与绝对值电机线不同）。 抱闸：带抱闸电机需接 24V 抱闸电源，由驱动控制时序自动释放/抱紧。 STO 安全端子：X8 的 STO1/STO2 出厂有短接片，不用安全功能时必须保留短接，否则驱动报 STO 激活无法使能。 PTI 版：脉冲/方向接 X8 的高速输入；数字量 IO 接 DI/DO。 PN 版：两个 PROFINET 口（X150 P1/P2），接到 PLC 或交换机。 新手高频坑：STO 短接片缺失、PE 不接地、U/V/W 与编码器不匹配（不同电机功率混接），是上电报警的三大主因。\n三、V-ASSISTANT 软件调试 V-ASSISTANT 是 V90 专用调试软件，通过 Mini-USB 或以太网 连接驱动。调试主线：\n3.1 连接与选择电机 USB/网线连接驱动，打开 V-ASSISTANT，在线连接到 V90。 软件自动识别电机（带电子铭牌的电机会自动读出型号）；若未识别需手动选型号。 确认驱动与电机订货号匹配。 3.2 选择控制模式 在「选择驱动」→ 设置控制模式，常用：\n控制模式 代号 说明 适用 外部脉冲位置控制 PTI 接收外部脉冲定位 PTI 版，PLC 发脉冲 内部位置控制 IPos 驱动内部定位块（最多 8 段） PTI 版，简单多段定位 速度控制 S / Speed 模拟量或固定转速 调速场合 转矩控制 T 转矩给定 张力控制 PROFINET 控制 — 由 PLC 经报文控制 PN 版 PN 版选 PROFINET 模式后，位置/速度由 PLC 通过报文给定，V-ASSISTANT 主要用于参数设置、优化和监控。\n3.3 基本参数设置 机械结构 / 电子齿轮比：设置电机转一圈对应的负载位移（丝杠导程、减速比），换算电子齿轮比，保证位置指令与实际位移一致。 回零方式：选择参考点/挡块/编码器零脉冲等回零模式。 JOG 速度、加减速时间、限位：设置点动速度、斜坡时间、软/硬限位。 数字量 IO 功能：分配 DI（使能 SON、报警复位 RESET、正反转限位 CWL/CCWL 等）和 DO（就绪、报警、定位完成等）。 3.4 JOG 试运行（关键一步） 参数设好后，务必先在 V-ASSISTANT 里 JOG 点动试运行，确认：\n电机能正常使能、转动方向正确、无异响； 编码器反馈正常、无跟随误差报警； 抱闸释放/抱紧时序正常。 JOG 通过说明接线和基本参数 OK，再进入与 PLC 的联调。\n3.5 一键优化（增益整定） V-ASSISTANT 提供一键自动优化：根据负载惯量比自动整定位置/速度环增益。\n先做惯量辨识，得到负载惯量比； 选择动态等级（保守/标准/动态），软件自动设增益； 试运行观察是否有振动、过冲，必要时手动微调刚性等级。 四、V90 PN 与 S7-1200/1500 的 PROFINET 组态 这是 PN 版的核心。V90 PN 作为 PROFINET IO 设备接入，由 PLC 通过**报文（Telegram）**交换控制字/状态字与设定值/实际值。\n4.1 安装 GSD 文件 TIA Portal 需先安装 V90 PN 的 GSDML 文件（选项 → 管理通用站描述文件），之后才能在硬件目录里找到 V90。\n4.2 添加设备并组网 网络视图中添加 V90 PN，拖到 PROFINET 网络上，与 PLC 的 PN 口连成同一子网。 分配 IP 地址 和 PROFINET 设备名称（设备名必须与在线分配给驱动的名称一致，否则连接不上）。 通过「在线 → 分配设备名称」把组态名称写入实际驱动。 4.3 选择报文类型 V90 PN 支持的常用报文：\n报文 用途 说明 标准报文 1 速度控制 16 位转速给定 标准报文 3 位置/速度控制 带编码器实际值，配合工艺对象做位置控制 西门子报文 111 基本定位器 EPOS 驱动内部定位器，PLC 给目标位置即可 用 TIA Portal 工艺对象（TO_PositioningAxis）+ 标准报文 3：位置控制在 PLC 侧由 TO 完成，最常用、最灵活。 用 报文 111 + EPOS：定位在驱动内部完成，PLC 只下目标位置和启动命令，PLC 侧编程更简单。 4.4 配置工艺对象（标准报文 3 方案） 在 PLC 项目中添加工艺对象 → TO_PositioningAxis（定位轴）。 在 TO 的「硬件接口」里，驱动选择已组态的 V90 PN，数据连接选标准报文 3。 设置编码器、机械参数（电子齿轮、丝杠导程）、动态默认值（速度/加减速）、限位等，需与 V-ASSISTANT 中的机械设置一致。 下载后用 TO 的调试面板做轴的使能、JOG、绝对/相对定位、回零测试。 4.5 PLC 侧运动控制指令 工艺对象配好后，用 MC（Motion Control）指令 控制轴（位于 工艺 → Motion Control）：\n指令 功能 MC_Power 轴使能 / 禁用 MC_Reset 故障复位 MC_Home 回零 MC_MoveJog 点动 MC_MoveAbsolute 绝对定位 MC_MoveRelative 相对定位 MC_MoveVelocity 速度运行 MC_Halt 停止 典型使能 + 定位逻辑（SCL 伪代码）：\n// 1. 上电使能 \"MC_Power\"(Axis := \"Axis_1\", Enable := axisEnable, StopMode := 0); // 2. 故障复位（上升沿） \"MC_Reset\"(Axis := \"Axis_1\", Execute := resetTrig); // 3. 回零（首次运行先回零） \"MC_Home\"(Axis := \"Axis_1\", Execute := homeTrig, Mode := 3); // 4. 绝对定位到 100mm，速度 50mm/s \"MC_MoveAbsolute\"(Axis := \"Axis_1\", Execute := moveTrig, Position := 100.0, Velocity := 50.0); IF \"MC_MoveAbsolute\".Done THEN // 定位完成 ; END_IF; 调试顺序建议：MC_Power 使能成功（Status=TRUE）→ MC_Reset 清故障 → MC_Home 回零 → 再做 MC_MoveAbsolute/Relative。先在 TO 调试面板验证，再写到程序里。\n五、常见报警与排查 V90 故障码以 F（故障） 和 A（报警） 开头，面板/软件显示。高频项：\n报警/现象 含义 排查方向 无法使能、报 STO STO 安全端子未短接/未激活 检查 X8 STO1/STO2 短接片或安全回路 F7801 / 过流 U/V/W 接线、电机短路、参数错 检查动力线、电机匹配、惯量比 F52xx 编码器故障 编码器线松动、干扰、电机不匹配 检查 X9 编码器线、屏蔽接地、PE F1911 等通讯故障 设备名/IP 不符、网线、报文不一致 核对 PROFINET 设备名、IP、报文类型 跟随误差过大 增益偏低、加减速太快、机械卡滞 重新一键优化、降低动态、查机械 振动 / 啸叫 增益过高、惯量比不准 重新惯量辨识，降低刚性等级 定位不准 / 比例不对 电子齿轮比 / 机械参数错 核对丝杠导程、减速比、TO 与驱动一致 排查口诀 先查使能链：STO 短接、SON 使能信号、无未复位故障 —— 不使能一切免谈。 再 JOG 验证：V-ASSISTANT 里点动通过，说明接线和电机参数 OK。 后通讯组态（PN 版）：设备名/IP/报文三者与 TIA Portal 一致。 比例与精度：电子齿轮、机械参数在 V-ASSISTANT 与 TO 两侧务必一致。 动态优化：先惯量辨识再一键优化，振动就降刚性，过冲就降动态。 六、调试流程速查 完整调试一条龙，照着走基本不会乱：\n接线检查 —— 主回路、U/V/W、编码器、PE、STO 短接片。 上电 / 连接 V-ASSISTANT —— 识别电机，确认订货号匹配。 选控制模式 —— PTI/IPos/Speed 或 PROFINET。 设基本参数 —— 电子齿轮、回零、JOG 速度、IO 功能。 JOG 试运行 —— 验证方向、反馈、抱闸。 一键优化 —— 惯量辨识 + 增益整定。 （PN 版）PROFINET 组态 —— 装 GSD、分配设备名/IP、选报文。 工艺对象 + MC 指令 —— TO 调试面板验证，再写 PLC 程序。 联调与精度校验 —— 定位精度、重复定位、限位、急停。 结语 V90 伺服调试的核心思路是分层验证、由内到外：先在 V-ASSISTANT 里把驱动本身（接线、电机、JOG、增益）调好，确认电机能稳定转动；再接入 PLC 做 PROFINET 通讯与运动控制。最容易卡住的几个点 —— STO 短接片、PROFINET 设备名一致、电子齿轮比两侧一致、先回零再定位 —— 记牢这几条，配合「使能链 → JOG → 通讯 → 精度 → 优化」的排查顺序，V90 的调试就会非常顺畅。PN 版搭配 TIA Portal 工艺对象和 MC 指令，能把伺服运动控制做得既精确又易维护。\n",
+  "wordCount" : "587",
+  "inLanguage": "zh-cn",
+  "datePublished": "2026-06-12T00:00:00Z",
+  "dateModified": "2026-06-12T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "ZML"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ZML's Blogs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://zmlgogogo.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://zmlgogogo.github.io/" accesskey="h" title="ZML&#39;s Blogs (Alt + H)">ZML&#39;s Blogs</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://zmlgogogo.github.io/archives" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/">主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      西门子 V90 伺服驱动调试配置全流程详解
+    </h1>
+    <div class="post-description">
+      从接线、版本选型到 V-ASSISTANT 参数设置、JOG 试运行、控制模式（PTI/IPos/Speed）配置，以及与 S7-1200/1500 经 PROFINET 报文（标准报文 3/111）通讯组态的完整 V90 伺服调试指南。
+    </div>
+    <div class="post-meta">
+
+<span title='2026-06-12 00:00:00 +0000 UTC'>2026年06月12日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;·&nbsp;<span>ZML</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/zmlgogogo/zmlgogogo.github.io/posts/siemens-v90-servo-commissioning.md" rel="noopener noreferrer edit" target="_blank">提出修改建议</a>
+    </span>
+
+</div>
+  </header> <details class="toc"  open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">目录</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%e4%b8%80v90-%e7%89%88%e6%9c%ac%e4%b8%8e%e9%80%89%e5%9e%8b" aria-label="一、V90 版本与选型">一、V90 版本与选型</a></li>
+            <li>
+                <a href="#%e4%ba%8c%e7%a1%ac%e4%bb%b6%e6%8e%a5%e7%ba%bf" aria-label="二、硬件接线">二、硬件接线</a><ul>
+                    
+            <li>
+                <a href="#21-%e4%b8%bb%e5%9b%9e%e8%b7%af" aria-label="2.1 主回路">2.1 主回路</a></li>
+            <li>
+                <a href="#22-%e6%8e%a7%e5%88%b6%e4%b8%8e%e7%bc%96%e7%a0%81%e5%99%a8" aria-label="2.2 控制与编码器">2.2 控制与编码器</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%b8%89v-assistant-%e8%bd%af%e4%bb%b6%e8%b0%83%e8%af%95" aria-label="三、V-ASSISTANT 软件调试">三、V-ASSISTANT 软件调试</a><ul>
+                    
+            <li>
+                <a href="#31-%e8%bf%9e%e6%8e%a5%e4%b8%8e%e9%80%89%e6%8b%a9%e7%94%b5%e6%9c%ba" aria-label="3.1 连接与选择电机">3.1 连接与选择电机</a></li>
+            <li>
+                <a href="#32-%e9%80%89%e6%8b%a9%e6%8e%a7%e5%88%b6%e6%a8%a1%e5%bc%8f" aria-label="3.2 选择控制模式">3.2 选择控制模式</a></li>
+            <li>
+                <a href="#33-%e5%9f%ba%e6%9c%ac%e5%8f%82%e6%95%b0%e8%ae%be%e7%bd%ae" aria-label="3.3 基本参数设置">3.3 基本参数设置</a></li>
+            <li>
+                <a href="#34-jog-%e8%af%95%e8%bf%90%e8%a1%8c%e5%85%b3%e9%94%ae%e4%b8%80%e6%ad%a5" aria-label="3.4 JOG 试运行（关键一步）">3.4 JOG 试运行（关键一步）</a></li>
+            <li>
+                <a href="#35-%e4%b8%80%e9%94%ae%e4%bc%98%e5%8c%96%e5%a2%9e%e7%9b%8a%e6%95%b4%e5%ae%9a" aria-label="3.5 一键优化（增益整定）">3.5 一键优化（增益整定）</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%9b%9bv90-pn-%e4%b8%8e-s7-12001500-%e7%9a%84-profinet-%e7%bb%84%e6%80%81" aria-label="四、V90 PN 与 S7-1200/1500 的 PROFINET 组态">四、V90 PN 与 S7-1200/1500 的 PROFINET 组态</a><ul>
+                    
+            <li>
+                <a href="#41-%e5%ae%89%e8%a3%85-gsd-%e6%96%87%e4%bb%b6" aria-label="4.1 安装 GSD 文件">4.1 安装 GSD 文件</a></li>
+            <li>
+                <a href="#42-%e6%b7%bb%e5%8a%a0%e8%ae%be%e5%a4%87%e5%b9%b6%e7%bb%84%e7%bd%91" aria-label="4.2 添加设备并组网">4.2 添加设备并组网</a></li>
+            <li>
+                <a href="#43-%e9%80%89%e6%8b%a9%e6%8a%a5%e6%96%87%e7%b1%bb%e5%9e%8b" aria-label="4.3 选择报文类型">4.3 选择报文类型</a></li>
+            <li>
+                <a href="#44-%e9%85%8d%e7%bd%ae%e5%b7%a5%e8%89%ba%e5%af%b9%e8%b1%a1%e6%a0%87%e5%87%86%e6%8a%a5%e6%96%87-3-%e6%96%b9%e6%a1%88" aria-label="4.4 配置工艺对象（标准报文 3 方案）">4.4 配置工艺对象（标准报文 3 方案）</a></li>
+            <li>
+                <a href="#45-plc-%e4%be%a7%e8%bf%90%e5%8a%a8%e6%8e%a7%e5%88%b6%e6%8c%87%e4%bb%a4" aria-label="4.5 PLC 侧运动控制指令">4.5 PLC 侧运动控制指令</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%ba%94%e5%b8%b8%e8%a7%81%e6%8a%a5%e8%ad%a6%e4%b8%8e%e6%8e%92%e6%9f%a5" aria-label="五、常见报警与排查">五、常见报警与排查</a><ul>
+                    
+            <li>
+                <a href="#%e6%8e%92%e6%9f%a5%e5%8f%a3%e8%af%80" aria-label="排查口诀">排查口诀</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%85%ad%e8%b0%83%e8%af%95%e6%b5%81%e7%a8%8b%e9%80%9f%e6%9f%a5" aria-label="六、调试流程速查">六、调试流程速查</a></li>
+            <li>
+                <a href="#%e7%bb%93%e8%af%ad" aria-label="结语">结语</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p>SINAMICS V90 是西门子面向通用运动控制的经济型伺服驱动，搭配 SIMOTICS S-1FL6 伺服电机，广泛用于定位、收放卷、贴标、包装等场合。本文按实际调试顺序，系统梳理 V90 从<strong>硬件接线 → 版本选型 → 参数设置 → 试运行 → 与 PLC 通讯组态</strong>的完整流程，覆盖脉冲（PTI）和 PROFINET（PN）两种主流版本。</p>
+<h2 id="一v90-版本与选型">一、V90 版本与选型<a hidden class="anchor" aria-hidden="true" href="#一v90-版本与选型">#</a></h2>
+<p>V90 分为两大硬件版本，调试方式差别很大，<strong>动手前必须先确认手里是哪一种</strong>：</p>
+<table>
+	<thead>
+			<tr>
+					<th>版本</th>
+					<th>接口</th>
+					<th>控制方式</th>
+					<th>调试软件</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><strong>V90 PTI</strong>（脉冲版）</td>
+					<td>脉冲/方向输入、模拟量</td>
+					<td>外部脉冲定位、模拟量调速、内部定位块</td>
+					<td>V-ASSISTANT</td>
+			</tr>
+			<tr>
+					<td><strong>V90 PN</strong>（总线版）</td>
+					<td>PROFINET</td>
+					<td>经 PN 报文由 PLC 控制（位置/速度）</td>
+					<td>V-ASSISTANT + TIA Portal</td>
+			</tr>
+	</tbody>
+</table>
+<ul>
+<li><strong>PTI 版</strong>：靠 PLC 高速脉冲输出（PTO）发脉冲控制，或用驱动内部的 IPos 定位块。接线简单，成本低，适合简单定位。</li>
+<li><strong>PN 版</strong>：通过 PROFINET 与 S7-1200/1500 通讯，配合工艺对象（TO）做精确运动控制，是目前主流。本文重点讲 PN 版与 PLC 的组态。</li>
+</ul>
+<p>电机与驱动还要匹配<strong>功率、电压等级（220V/400V）、是否带抱闸、编码器类型（增量/绝对值）</strong>，订货号需对应。</p>
+<hr>
+<h2 id="二硬件接线">二、硬件接线<a hidden class="anchor" aria-hidden="true" href="#二硬件接线">#</a></h2>
+<h3 id="21-主回路">2.1 主回路<a hidden class="anchor" aria-hidden="true" href="#21-主回路">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th>端子</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>L1/L2/L3（或 L1/L2）</td>
+					<td>主电源输入，注意电压等级 220V 单相/三相 或 400V 三相</td>
+			</tr>
+			<tr>
+					<td>U/V/W</td>
+					<td>接伺服电机动力线，<strong>相序必须对应</strong>，接反会导致失控或报警</td>
+			</tr>
+			<tr>
+					<td>DCP/DCN</td>
+					<td>直流母线 / 外接制动电阻（大惯量、频繁启停时需外接）</td>
+			</tr>
+			<tr>
+					<td>PE</td>
+					<td>保护接地，<strong>务必可靠接地</strong>，否则编码器易受干扰报警</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="22-控制与编码器">2.2 控制与编码器<a hidden class="anchor" aria-hidden="true" href="#22-控制与编码器">#</a></h3>
+<ul>
+<li><strong>编码器线</strong>：连接电机编码器到驱动 X9（注意增量式与绝对值电机线不同）。</li>
+<li><strong>抱闸</strong>：带抱闸电机需接 24V 抱闸电源，由驱动控制时序自动释放/抱紧。</li>
+<li><strong>STO 安全端子</strong>：X8 的 STO1/STO2 出厂有短接片，<strong>不用安全功能时必须保留短接</strong>，否则驱动报 STO 激活无法使能。</li>
+<li><strong>PTI 版</strong>：脉冲/方向接 X8 的高速输入；数字量 IO 接 DI/DO。</li>
+<li><strong>PN 版</strong>：两个 PROFINET 口（X150 P1/P2），接到 PLC 或交换机。</li>
+</ul>
+<blockquote>
+<p><strong>新手高频坑</strong>：STO 短接片缺失、PE 不接地、U/V/W 与编码器不匹配（不同电机功率混接），是上电报警的三大主因。</p>
+</blockquote>
+<hr>
+<h2 id="三v-assistant-软件调试">三、V-ASSISTANT 软件调试<a hidden class="anchor" aria-hidden="true" href="#三v-assistant-软件调试">#</a></h2>
+<p>V-ASSISTANT 是 V90 专用调试软件，通过 <strong>Mini-USB 或以太网</strong> 连接驱动。调试主线：</p>
+<h3 id="31-连接与选择电机">3.1 连接与选择电机<a hidden class="anchor" aria-hidden="true" href="#31-连接与选择电机">#</a></h3>
+<ol>
+<li>USB/网线连接驱动，打开 V-ASSISTANT，在线连接到 V90。</li>
+<li>软件自动识别电机（带电子铭牌的电机会自动读出型号）；若未识别需手动选型号。</li>
+<li>确认驱动与电机订货号匹配。</li>
+</ol>
+<h3 id="32-选择控制模式">3.2 选择控制模式<a hidden class="anchor" aria-hidden="true" href="#32-选择控制模式">#</a></h3>
+<p>在「选择驱动」→ 设置<strong>控制模式</strong>，常用：</p>
+<table>
+	<thead>
+			<tr>
+					<th>控制模式</th>
+					<th>代号</th>
+					<th>说明</th>
+					<th>适用</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>外部脉冲位置控制</td>
+					<td>PTI</td>
+					<td>接收外部脉冲定位</td>
+					<td>PTI 版，PLC 发脉冲</td>
+			</tr>
+			<tr>
+					<td>内部位置控制</td>
+					<td>IPos</td>
+					<td>驱动内部定位块（最多 8 段）</td>
+					<td>PTI 版，简单多段定位</td>
+			</tr>
+			<tr>
+					<td>速度控制</td>
+					<td>S / Speed</td>
+					<td>模拟量或固定转速</td>
+					<td>调速场合</td>
+			</tr>
+			<tr>
+					<td>转矩控制</td>
+					<td>T</td>
+					<td>转矩给定</td>
+					<td>张力控制</td>
+			</tr>
+			<tr>
+					<td>PROFINET 控制</td>
+					<td>—</td>
+					<td>由 PLC 经报文控制</td>
+					<td><strong>PN 版</strong></td>
+			</tr>
+	</tbody>
+</table>
+<blockquote>
+<p>PN 版选 PROFINET 模式后，位置/速度由 PLC 通过报文给定，V-ASSISTANT 主要用于参数设置、优化和监控。</p>
+</blockquote>
+<h3 id="33-基本参数设置">3.3 基本参数设置<a hidden class="anchor" aria-hidden="true" href="#33-基本参数设置">#</a></h3>
+<ul>
+<li><strong>机械结构 / 电子齿轮比</strong>：设置电机转一圈对应的负载位移（丝杠导程、减速比），换算电子齿轮比，保证位置指令与实际位移一致。</li>
+<li><strong>回零方式</strong>：选择参考点/挡块/编码器零脉冲等回零模式。</li>
+<li><strong>JOG 速度、加减速时间、限位</strong>：设置点动速度、斜坡时间、软/硬限位。</li>
+<li><strong>数字量 IO 功能</strong>：分配 DI（使能 SON、报警复位 RESET、正反转限位 CWL/CCWL 等）和 DO（就绪、报警、定位完成等）。</li>
+</ul>
+<h3 id="34-jog-试运行关键一步">3.4 JOG 试运行（关键一步）<a hidden class="anchor" aria-hidden="true" href="#34-jog-试运行关键一步">#</a></h3>
+<p>参数设好后，<strong>务必先在 V-ASSISTANT 里 JOG 点动试运行</strong>，确认：</p>
+<ol>
+<li>电机能正常使能、转动方向正确、无异响；</li>
+<li>编码器反馈正常、无跟随误差报警；</li>
+<li>抱闸释放/抱紧时序正常。</li>
+</ol>
+<p>JOG 通过说明接线和基本参数 OK，再进入与 PLC 的联调。</p>
+<h3 id="35-一键优化增益整定">3.5 一键优化（增益整定）<a hidden class="anchor" aria-hidden="true" href="#35-一键优化增益整定">#</a></h3>
+<p>V-ASSISTANT 提供<strong>一键自动优化</strong>：根据负载惯量比自动整定位置/速度环增益。</p>
+<ul>
+<li>先做<strong>惯量辨识</strong>，得到负载惯量比；</li>
+<li>选择动态等级（保守/标准/动态），软件自动设增益；</li>
+<li>试运行观察是否有振动、过冲，必要时手动微调刚性等级。</li>
+</ul>
+<hr>
+<h2 id="四v90-pn-与-s7-12001500-的-profinet-组态">四、V90 PN 与 S7-1200/1500 的 PROFINET 组态<a hidden class="anchor" aria-hidden="true" href="#四v90-pn-与-s7-12001500-的-profinet-组态">#</a></h2>
+<p>这是 PN 版的核心。V90 PN 作为 PROFINET IO 设备接入，由 PLC 通过**报文（Telegram）**交换控制字/状态字与设定值/实际值。</p>
+<h3 id="41-安装-gsd-文件">4.1 安装 GSD 文件<a hidden class="anchor" aria-hidden="true" href="#41-安装-gsd-文件">#</a></h3>
+<p>TIA Portal 需先安装 V90 PN 的 <strong>GSDML 文件</strong>（<code>选项 → 管理通用站描述文件</code>），之后才能在硬件目录里找到 V90。</p>
+<h3 id="42-添加设备并组网">4.2 添加设备并组网<a hidden class="anchor" aria-hidden="true" href="#42-添加设备并组网">#</a></h3>
+<ol>
+<li>网络视图中添加 V90 PN，拖到 PROFINET 网络上，与 PLC 的 PN 口连成同一子网。</li>
+<li>分配 <strong>IP 地址</strong> 和 <strong>PROFINET 设备名称</strong>（设备名必须与在线分配给驱动的名称一致，否则连接不上）。</li>
+<li>通过「在线 → 分配设备名称」把组态名称写入实际驱动。</li>
+</ol>
+<h3 id="43-选择报文类型">4.3 选择报文类型<a hidden class="anchor" aria-hidden="true" href="#43-选择报文类型">#</a></h3>
+<p>V90 PN 支持的常用报文：</p>
+<table>
+	<thead>
+			<tr>
+					<th>报文</th>
+					<th>用途</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><strong>标准报文 1</strong></td>
+					<td>速度控制</td>
+					<td>16 位转速给定</td>
+			</tr>
+			<tr>
+					<td><strong>标准报文 3</strong></td>
+					<td>位置/速度控制</td>
+					<td>带编码器实际值，配合工艺对象做位置控制</td>
+			</tr>
+			<tr>
+					<td><strong>西门子报文 111</strong></td>
+					<td>基本定位器 EPOS</td>
+					<td>驱动内部定位器，PLC 给目标位置即可</td>
+			</tr>
+	</tbody>
+</table>
+<ul>
+<li>用 <strong>TIA Portal 工艺对象（TO_PositioningAxis）+ 标准报文 3</strong>：位置控制在 PLC 侧由 TO 完成，最常用、最灵活。</li>
+<li>用 <strong>报文 111 + EPOS</strong>：定位在驱动内部完成，PLC 只下目标位置和启动命令，PLC 侧编程更简单。</li>
+</ul>
+<h3 id="44-配置工艺对象标准报文-3-方案">4.4 配置工艺对象（标准报文 3 方案）<a hidden class="anchor" aria-hidden="true" href="#44-配置工艺对象标准报文-3-方案">#</a></h3>
+<ol>
+<li>在 PLC 项目中添加<strong>工艺对象 → TO_PositioningAxis（定位轴）</strong>。</li>
+<li>在 TO 的「硬件接口」里，驱动选择已组态的 V90 PN，数据连接选<strong>标准报文 3</strong>。</li>
+<li>设置<strong>编码器</strong>、<strong>机械参数</strong>（电子齿轮、丝杠导程）、<strong>动态默认值</strong>（速度/加减速）、<strong>限位</strong>等，需与 V-ASSISTANT 中的机械设置一致。</li>
+<li>下载后用 TO 的<strong>调试面板</strong>做轴的使能、JOG、绝对/相对定位、回零测试。</li>
+</ol>
+<h3 id="45-plc-侧运动控制指令">4.5 PLC 侧运动控制指令<a hidden class="anchor" aria-hidden="true" href="#45-plc-侧运动控制指令">#</a></h3>
+<p>工艺对象配好后，用 <strong>MC（Motion Control）指令</strong> 控制轴（位于 <code>工艺 → Motion Control</code>）：</p>
+<table>
+	<thead>
+			<tr>
+					<th>指令</th>
+					<th>功能</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>MC_Power</code></td>
+					<td>轴使能 / 禁用</td>
+			</tr>
+			<tr>
+					<td><code>MC_Reset</code></td>
+					<td>故障复位</td>
+			</tr>
+			<tr>
+					<td><code>MC_Home</code></td>
+					<td>回零</td>
+			</tr>
+			<tr>
+					<td><code>MC_MoveJog</code></td>
+					<td>点动</td>
+			</tr>
+			<tr>
+					<td><code>MC_MoveAbsolute</code></td>
+					<td>绝对定位</td>
+			</tr>
+			<tr>
+					<td><code>MC_MoveRelative</code></td>
+					<td>相对定位</td>
+			</tr>
+			<tr>
+					<td><code>MC_MoveVelocity</code></td>
+					<td>速度运行</td>
+			</tr>
+			<tr>
+					<td><code>MC_Halt</code></td>
+					<td>停止</td>
+			</tr>
+	</tbody>
+</table>
+<p>典型使能 + 定位逻辑（SCL 伪代码）：</p>
+<pre tabindex="0"><code class="language-pascal" data-lang="pascal">// 1. 上电使能
+&#34;MC_Power&#34;(Axis := &#34;Axis_1&#34;, Enable := axisEnable, StopMode := 0);
+
+// 2. 故障复位（上升沿）
+&#34;MC_Reset&#34;(Axis := &#34;Axis_1&#34;, Execute := resetTrig);
+
+// 3. 回零（首次运行先回零）
+&#34;MC_Home&#34;(Axis := &#34;Axis_1&#34;, Execute := homeTrig, Mode := 3);
+
+// 4. 绝对定位到 100mm，速度 50mm/s
+&#34;MC_MoveAbsolute&#34;(Axis     := &#34;Axis_1&#34;,
+                  Execute  := moveTrig,
+                  Position := 100.0,
+                  Velocity := 50.0);
+IF &#34;MC_MoveAbsolute&#34;.Done THEN
+    // 定位完成
+    ;
+END_IF;
+</code></pre><blockquote>
+<p>调试顺序建议：<code>MC_Power</code> 使能成功（Status=TRUE）→ <code>MC_Reset</code> 清故障 → <code>MC_Home</code> 回零 → 再做 <code>MC_MoveAbsolute/Relative</code>。先在 TO 调试面板验证，再写到程序里。</p>
+</blockquote>
+<hr>
+<h2 id="五常见报警与排查">五、常见报警与排查<a hidden class="anchor" aria-hidden="true" href="#五常见报警与排查">#</a></h2>
+<p>V90 故障码以 <strong>F（故障）</strong> 和 <strong>A（报警）</strong> 开头，面板/软件显示。高频项：</p>
+<table>
+	<thead>
+			<tr>
+					<th>报警/现象</th>
+					<th>含义</th>
+					<th>排查方向</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>无法使能、报 STO</td>
+					<td>STO 安全端子未短接/未激活</td>
+					<td>检查 X8 STO1/STO2 短接片或安全回路</td>
+			</tr>
+			<tr>
+					<td>F7801 / 过流</td>
+					<td>U/V/W 接线、电机短路、参数错</td>
+					<td>检查动力线、电机匹配、惯量比</td>
+			</tr>
+			<tr>
+					<td>F52xx 编码器故障</td>
+					<td>编码器线松动、干扰、电机不匹配</td>
+					<td>检查 X9 编码器线、屏蔽接地、PE</td>
+			</tr>
+			<tr>
+					<td>F1911 等通讯故障</td>
+					<td>设备名/IP 不符、网线、报文不一致</td>
+					<td>核对 PROFINET 设备名、IP、报文类型</td>
+			</tr>
+			<tr>
+					<td>跟随误差过大</td>
+					<td>增益偏低、加减速太快、机械卡滞</td>
+					<td>重新一键优化、降低动态、查机械</td>
+			</tr>
+			<tr>
+					<td>振动 / 啸叫</td>
+					<td>增益过高、惯量比不准</td>
+					<td>重新惯量辨识，降低刚性等级</td>
+			</tr>
+			<tr>
+					<td>定位不准 / 比例不对</td>
+					<td>电子齿轮比 / 机械参数错</td>
+					<td>核对丝杠导程、减速比、TO 与驱动一致</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="排查口诀">排查口诀<a hidden class="anchor" aria-hidden="true" href="#排查口诀">#</a></h3>
+<ol>
+<li><strong>先查使能链</strong>：STO 短接、SON 使能信号、无未复位故障 —— 不使能一切免谈。</li>
+<li><strong>再 JOG 验证</strong>：V-ASSISTANT 里点动通过，说明接线和电机参数 OK。</li>
+<li><strong>后通讯组态</strong>（PN 版）：设备名/IP/报文三者与 TIA Portal 一致。</li>
+<li><strong>比例与精度</strong>：电子齿轮、机械参数在 V-ASSISTANT 与 TO 两侧务必一致。</li>
+<li><strong>动态优化</strong>：先惯量辨识再一键优化，振动就降刚性，过冲就降动态。</li>
+</ol>
+<hr>
+<h2 id="六调试流程速查">六、调试流程速查<a hidden class="anchor" aria-hidden="true" href="#六调试流程速查">#</a></h2>
+<p>完整调试一条龙，照着走基本不会乱：</p>
+<ol>
+<li><strong>接线检查</strong> —— 主回路、U/V/W、编码器、PE、STO 短接片。</li>
+<li><strong>上电 / 连接 V-ASSISTANT</strong> —— 识别电机，确认订货号匹配。</li>
+<li><strong>选控制模式</strong> —— PTI/IPos/Speed 或 PROFINET。</li>
+<li><strong>设基本参数</strong> —— 电子齿轮、回零、JOG 速度、IO 功能。</li>
+<li><strong>JOG 试运行</strong> —— 验证方向、反馈、抱闸。</li>
+<li><strong>一键优化</strong> —— 惯量辨识 + 增益整定。</li>
+<li><strong>（PN 版）PROFINET 组态</strong> —— 装 GSD、分配设备名/IP、选报文。</li>
+<li><strong>工艺对象 + MC 指令</strong> —— TO 调试面板验证，再写 PLC 程序。</li>
+<li><strong>联调与精度校验</strong> —— 定位精度、重复定位、限位、急停。</li>
+</ol>
+<hr>
+<h2 id="结语">结语<a hidden class="anchor" aria-hidden="true" href="#结语">#</a></h2>
+<p>V90 伺服调试的核心思路是<strong>分层验证、由内到外</strong>：先在 V-ASSISTANT 里把驱动本身（接线、电机、JOG、增益）调好，确认电机能稳定转动；再接入 PLC 做 PROFINET 通讯与运动控制。最容易卡住的几个点 —— <strong>STO 短接片、PROFINET 设备名一致、电子齿轮比两侧一致、先回零再定位</strong> —— 记牢这几条，配合「使能链 → JOG → 通讯 → 精度 → 优化」的排查顺序，V90 的调试就会非常顺畅。PN 版搭配 TIA Portal 工艺对象和 MC 指令，能把伺服运动控制做得既精确又易维护。</p>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/">西门子</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/v90/">V90</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/%E4%BC%BA%E6%9C%8D/">伺服</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/profinet/">PROFINET</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/%E8%BF%90%E5%8A%A8%E6%8E%A7%E5%88%B6/">运动控制</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/tia-portal/">TIA Portal</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+    <span class="title">下一页 »</span>
+    <span>西门子 PLC 的 Modbus (RTU) 通讯指令详解</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/zmlgogogo">zml</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

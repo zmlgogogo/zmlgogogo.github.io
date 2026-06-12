@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Wed, 10 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 12 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 V90 伺服驱动调试配置全流程详解</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/</link>
+      <pubDate>Fri, 12 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/</guid>
+      <description>从接线、版本选型到 V-ASSISTANT 参数设置、JOG 试运行、控制模式（PTI/IPos/Speed）配置，以及与 S7-1200/1500 经 PROFINET 报文（标准报文 3/111）通讯组态的完整 V90 伺服调试指南。</description>
+    </item>
     <item>
       <title>西门子 PLC 的 Modbus (RTU) 通讯指令详解</title>
       <link>https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/</link>
