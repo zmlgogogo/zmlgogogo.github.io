@@ -7,8 +7,43 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Fri, 12 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 G120 / V20 变频器 PROFINET 控制详解（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/</guid>
+      <description>讲解西门子 G120 / V20 变频器经 PROFINET 与 S7-1200/1500 通讯控制：标准报文 1/352、控制字 STW1 与状态字 ZSW1、主设定值频率换算、起停调速编程，以及 BOP/参数设置与常见故障排查。</description>
+    </item>
+    <item>
+      <title>西门子 PID_Compact 闭环控制调试详解（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-pid-compact/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-pid-compact/</guid>
+      <description>讲解西门子 S7-1200/1500 的 PID_Compact 工艺对象：PID 闭环控制原理、组态步骤、Input/Output 参数、量程标定、手动/自动整定（预调节与精确调节）、参数 Kp/Ti/Td 含义与温度压力闭环调试排查。</description>
+    </item>
+    <item>
+      <title>西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-profibus-dp/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-profibus-dp/</guid>
+      <description>讲解西门子 PLC 的 PROFIBUS DP 现场总线：S7-1200 经 CM 1243-5 作主站、S7-1500 集成 DP 口，涵盖 GSD 安装、主从组态、站地址与波特率、终端电阻、IO 地址映射与常见诊断排查。</description>
+    </item>
+    <item>
+      <title>西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/</guid>
+      <description>讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。</description>
+    </item>
+    <item>
+      <title>西门子开放式用户通讯 OUC 详解：TSEND_C / TRCV_C（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-open-user-communication/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-open-user-communication/</guid>
+      <description>讲解西门子 S7-1200/1500 的开放式用户通讯（OUC），用 TSEND_C / TRCV_C 实现与上位机、第三方设备的 TCP/ISO-on-TCP/UDP 自由通讯，涵盖连接参数 TCON、收发指令参数、数据收发处理与常见排查。</description>
+    </item>
     <item>
       <title>西门子 V90 伺服驱动调试配置全流程详解</title>
       <link>https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/</link>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200 | ZML&#39;s Blogs</title>
+<meta name="keywords" content="西门子, PLC, S7-1200, 分布式IO, ET200, PROFINET, TIA Portal">
+<meta name="description" content="讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。">
+<meta name="author" content="ZML">
+<link rel="canonical" href="https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.8402523d366be05a2a71a1e346aadc28a50ae3e87baa9354b032bd5db2654f9e.css" integrity="sha256-hAJSPTZr4FoqcaHjRqrcKKUK4&#43;h7qpNUsDK9XbJlT54=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://zmlgogogo.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://zmlgogogo.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://zmlgogogo.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://zmlgogogo.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://zmlgogogo.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh-cn" href="https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/">
+  <meta property="og:site_name" content="ZML&#39;s Blogs">
+  <meta property="og:title" content="西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200">
+  <meta property="og:description" content="讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-06-13T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-06-13T00:00:00+00:00">
+    <meta property="article:tag" content="西门子">
+    <meta property="article:tag" content="PLC">
+    <meta property="article:tag" content="S7-1200">
+    <meta property="article:tag" content="分布式IO">
+    <meta property="article:tag" content="ET200">
+    <meta property="article:tag" content="PROFINET">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-pid-compact/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-profibus-dp/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-open-user-communication/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/">
+      <meta property="og:see_also" content="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200">
+  <meta name="twitter:description" content="讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://zmlgogogo.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200",
+      "item": "https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200",
+  "name": "西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200",
+  "description": "讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。",
+  "keywords": [
+    "西门子", "PLC", "S7-1200", "分布式IO", "ET200", "PROFINET", "TIA Portal"
+  ],
+  "articleBody": "在稍具规模的自动化系统中，IO 点往往分散在多个机柜、多台设备上。如果全部用导线拉回主控柜，线缆成本高、施工繁琐、维护困难。分布式 IO 把 IO 模块就近安装在现场，通过一根总线与 PLC 通讯，大幅减少接线。本文讲解 S7-1200 如何通过 PROFINET 连接 ET 200 系列分布式 IO，覆盖从概念、组态到诊断的完整流程。\n一、分布式 IO 基础 1.1 什么是分布式 IO 集中式 IO：IO 模块直接插在 CPU 旁边（S7-1200 本体 + 信号模块 SM），所有现场信号用导线拉回主控柜。 分布式 IO（Distributed IO）：IO 站就近安装在现场设备旁，只用一根 PROFINET 网线（或 PROFIBUS 电缆）连回 PLC。现场信号在本地接线，数据通过总线传输。 优势：节省线缆、施工和调试更快、扩展灵活、便于模块化设计与远程诊断。\n1.2 S7-1200 支持的连接方式 S7-1200 本体只有 PROFINET 口，因此分布式 IO 主要走 PROFINET IO：\n方式 说明 S7-1200 支持 PROFINET IO 基于工业以太网，即插即用、诊断强 ✅ 原生支持（本体 PN 口） PROFIBUS DP 传统现场总线 需加 CM 1243-5（DP 主站）通讯模块 本文以主流的 PROFINET IO 为主。S7-1200 作为 IO 控制器（Controller），ET 200 等分布式站作为 IO 设备（Device）。\n1.3 常见 ET 200 分布式 IO 家族 型号 特点 典型场景 ET 200SP 新一代、紧凑、热插拔、单通道可更换 当前主流首选 ET 200S 上一代模块化 IO 存量系统 ET 200MP 高性能、与 S7-1500 同模块 大型 IO 站 ET 200eco PN 一体式、IP67 现场防护 无需机柜、直接装设备上 ET 200pro IP65/67 高防护模块化 恶劣环境 每个 ET 200 站由 接口模块（IM，如 ET 200SP 的 IM 155-6 PN）+ IO 模块（DI/DO/AI/AO）+ 服务模块/终端 组成。\n二、组态前准备 2.1 网络规划 规划 IP 网段：PLC 与所有 PROFINET 设备需在同一子网（如 192.168.0.x）。 规划 PROFINET 设备名称：每台 IO 设备一个唯一名称（如 et200sp-1），这是 PROFINET 寻址的关键。 物理拓扑：PLC ↔ 交换机 ↔ 各 IO 站，或线型菊花链（ET 200SP 接口模块自带双口可串接）。 2.2 安装 GSD 文件（如需要） TIA Portal 硬件目录里已自带常见西门子 ET 200 模块，一般无需额外安装。若使用较新模块或第三方 PROFINET 设备，需通过 选项 → 管理通用站描述文件（GSD） 安装对应 GSDML 文件。\n三、TIA Portal 组态步骤 3.1 添加并连接设备 新建项目，添加 S7-1200 CPU。 进入网络视图，从右侧硬件目录 分布式 I/O → ET 200SP → 接口模块 拖出对应 IM（如 IM 155-6 PN ST）到网络视图。 用鼠标从 CPU 的 PROFINET 口 拖一条线到 ET 200 的 PN 口，建立 PROFINET IO 系统（连线变绿，出现 PNIO 系统）。 3.2 配置 ET 200 站的 IO 模块 双击 ET 200 站进入设备视图。 从硬件目录按现场实际，依次插入 DI、DO、AI、AO 等模块到对应槽位，顺序和型号必须与实物完全一致。 ET 200SP 还需在末尾放置 服务器模块（Server Module） 作为终端。 3.3 分配 IP 地址与设备名称 这是 PROFINET 能否通讯的核心：\n选中 ET 200 的接口模块 → 属性 → 以太网地址： 设置 IP 地址（与 PLC 同网段）； 设置 PROFINET 设备名称（组态名称）。 组态名称只是「图纸上的名字」，必须写进实物设备： 在线状态下 在线 → 分配设备名称，把组态名称下发到实际 IO 设备； 也可 分配 IP 地址 在线写 IP。 关键：实际设备的 PROFINET 名称必须与组态中的名称完全一致，PROFINET 启动时靠名称找设备、再分配 IP。名称对不上 → 设备红叉、无法进入数据交换。\n3.4 IO 地址映射 插入模块后，TIA Portal 会自动给每个模块分配 I/O 地址（输入 I 区、输出 Q 区）：\n在设备视图选中模块，「I/O 地址」里可看到/修改起始地址，例如某 DI 16 通道模块占 I0.0~I1.7。 程序里直接用这些 I/Q 地址访问现场信号，与本体 IO 用法完全相同，感受不到「分布式」的存在。 模块 类型 自动分配地址（示例） DI 16×24VDC 数字量输入 I0.0 ~ I1.7 DQ 16×24VDC 数字量输出 Q0.0 ~ Q1.7 AI 4×U/I 模拟量输入 IW64 ~ IW70 AQ 2×U/I 模拟量输出 QW80 ~ QW82 3.5 拓扑组态（可选但推荐） 在拓扑视图中，把各设备的端口按实际网线连接关系连好。好处：\n启用端口互联后，可使用 不带交换机更换设备（LLDP 邻居检测）：换上同型号新设备无需重新分配名称，控制器自动按拓扑识别并下发名称。 拓扑诊断更直观，断线/错插能精确定位到端口。 3.6 编译下载 组态完成后编译、下载到 PLC。下载后 PLC 会按设备名称启动各 IO 站，进入循环数据交换。\n四、实战示例：S7-1200 + 一台 ET 200SP 场景：S7-1200（IP 192.168.0.1）通过 PROFINET 连接一台 ET 200SP（IP 192.168.0.10，名称 et200sp-1），站上有 16 点 DI、16 点 DO。\n步骤：\n网络视图添加 CPU 与 ET 200SP（IM 155-6 PN ST），连线建立 PNIO 系统。 ET 200SP 设备视图依次插入：DI 16×24VDC、DQ 16×24VDC、服务器模块。 接口模块设 IP 192.168.0.10、设备名 et200sp-1。 记下自动分配的地址：DI → I8.0~I9.7，DO → Q8.0~Q9.7（示例，以实际为准）。 在线 → 分配设备名称，把 et200sp-1 写入实物。 编译下载。 程序里直接用： // 读现场按钮（接在 ET 200SP 的 DI 上） IF \"I8.0\" THEN // 现场启动按钮 \"Q8.0\" := TRUE; // 驱动现场指示灯/继电器 END_IF; —— 程序中完全像用本体 IO 一样使用分布式 IO 点。\n五、常见问题与诊断 5.1 高频问题 现象 可能原因 排查方向 设备红叉、不进入数据交换 设备名称未分配/不一致 在线 → 分配设备名称，确保与组态一致 找不到设备 IP 不同网段、网线、交换机 核对 IP 同网段、在线访问扫描设备 组态与实际不符报警 模块型号/槽位/顺序不一致 对照实物逐槽核对模块订货号 模块通道无信号 接线、供电、通道参数 查现场接线、负载电源、模块诊断 站点偶尔掉线 网线/接头、干扰、电源 检查屏蔽接地、网线质量、24V 供电 更换新设备后不通 新设备无名称 重新分配名称，或用拓扑+LLDP 自动命名 5.2 利用诊断功能 PROFINET 的强项就是诊断：\n在线 \u0026 诊断：选中设备查看状态、模块级/通道级故障（如断线、过载、超量程）能精确到通道。 设备 LED：接口模块的 BF（总线故障）、SF（系统故障）灯指示连接与模块状态。 诊断中断 OB：组态诊断中断后，模块故障会触发 OB82（诊断错误中断），可在程序里读取并处理。 拓扑对比：拓扑视图在线对比「组态 vs 实际」，错接/断线一目了然。 5.3 排查口诀 先通网络：IP 同网段，在线访问能扫到设备。 再核名称：PROFINET 设备名组态与实物完全一致（最高频故障）。 后对组态：模块型号、槽位、顺序与实物逐一对应。 看诊断灯/缓冲区：BF/SF 灯 + 在线诊断定位到模块/通道。 用拓扑：组态端口互联，断线错插精确定位、换件免命名。 六、要点速查 环节 关键点 连接方式 S7-1200 本体 PN 口走 PROFINET IO；DP 需加 CM 1243-5 角色 CPU = IO 控制器；ET 200 = IO 设备 寻址核心 PROFINET 设备名称 必须组态与实物一致 IP 所有设备同子网 模块组态 型号/槽位/顺序与实物完全一致，ET 200SP 末尾加服务器模块 地址使用 自动分配 I/Q 地址，程序里像本体 IO 一样用 拓扑 组态端口互联，支持换件免命名 + 精确诊断 诊断 在线诊断到通道级 + OB82 诊断中断 结语 S7-1200 通过 PROFINET 接入 ET 200 分布式 IO，本质上就是把现场 IO「搬」到总线另一端，而对程序员几乎透明 —— 组态完成后，分布式 IO 点和本体 IO 用法完全一样。整个过程最容易卡住的就一处：PROFINET 设备名称必须组态与实物一致，这是 PROFINET 寻址的根基；其次是模块型号与槽位顺序要和实物对齐。配合拓扑组态和强大的通道级诊断，分布式 IO 不仅省线省工，出了故障也能快速定位到具体模块和通道，是现代自动化系统的标准做法。\n",
+  "wordCount" : "546",
+  "inLanguage": "zh-cn",
+  "datePublished": "2026-06-13T00:00:00Z",
+  "dateModified": "2026-06-13T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "ZML"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "ZML's Blogs",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://zmlgogogo.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://zmlgogogo.github.io/" accesskey="h" title="ZML&#39;s Blogs (Alt + H)">ZML&#39;s Blogs</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://zmlgogogo.github.io/archives" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://zmlgogogo.github.io/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/">主页</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/posts/">Posts</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200
+    </h1>
+    <div class="post-description">
+      讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。
+    </div>
+    <div class="post-meta">
+
+<span title='2026-06-13 00:00:00 +0000 UTC'>2026年06月13日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;·&nbsp;<span>ZML</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/zmlgogogo/zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io.md" rel="noopener noreferrer edit" target="_blank">提出修改建议</a>
+    </span>
+
+</div>
+  </header> <details class="toc"  open>
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">目录</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#%e4%b8%80%e5%88%86%e5%b8%83%e5%bc%8f-io-%e5%9f%ba%e7%a1%80" aria-label="一、分布式 IO 基础">一、分布式 IO 基础</a><ul>
+                    
+            <li>
+                <a href="#11-%e4%bb%80%e4%b9%88%e6%98%af%e5%88%86%e5%b8%83%e5%bc%8f-io" aria-label="1.1 什么是分布式 IO">1.1 什么是分布式 IO</a></li>
+            <li>
+                <a href="#12-s7-1200-%e6%94%af%e6%8c%81%e7%9a%84%e8%bf%9e%e6%8e%a5%e6%96%b9%e5%bc%8f" aria-label="1.2 S7-1200 支持的连接方式">1.2 S7-1200 支持的连接方式</a></li>
+            <li>
+                <a href="#13-%e5%b8%b8%e8%a7%81-et-200-%e5%88%86%e5%b8%83%e5%bc%8f-io-%e5%ae%b6%e6%97%8f" aria-label="1.3 常见 ET 200 分布式 IO 家族">1.3 常见 ET 200 分布式 IO 家族</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%ba%8c%e7%bb%84%e6%80%81%e5%89%8d%e5%87%86%e5%a4%87" aria-label="二、组态前准备">二、组态前准备</a><ul>
+                    
+            <li>
+                <a href="#21-%e7%bd%91%e7%bb%9c%e8%a7%84%e5%88%92" aria-label="2.1 网络规划">2.1 网络规划</a></li>
+            <li>
+                <a href="#22-%e5%ae%89%e8%a3%85-gsd-%e6%96%87%e4%bb%b6%e5%a6%82%e9%9c%80%e8%a6%81" aria-label="2.2 安装 GSD 文件（如需要）">2.2 安装 GSD 文件（如需要）</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e4%b8%89tia-portal-%e7%bb%84%e6%80%81%e6%ad%a5%e9%aa%a4" aria-label="三、TIA Portal 组态步骤">三、TIA Portal 组态步骤</a><ul>
+                    
+            <li>
+                <a href="#31-%e6%b7%bb%e5%8a%a0%e5%b9%b6%e8%bf%9e%e6%8e%a5%e8%ae%be%e5%a4%87" aria-label="3.1 添加并连接设备">3.1 添加并连接设备</a></li>
+            <li>
+                <a href="#32-%e9%85%8d%e7%bd%ae-et-200-%e7%ab%99%e7%9a%84-io-%e6%a8%a1%e5%9d%97" aria-label="3.2 配置 ET 200 站的 IO 模块">3.2 配置 ET 200 站的 IO 模块</a></li>
+            <li>
+                <a href="#33-%e5%88%86%e9%85%8d-ip-%e5%9c%b0%e5%9d%80%e4%b8%8e%e8%ae%be%e5%a4%87%e5%90%8d%e7%a7%b0" aria-label="3.3 分配 IP 地址与设备名称">3.3 分配 IP 地址与设备名称</a></li>
+            <li>
+                <a href="#34-io-%e5%9c%b0%e5%9d%80%e6%98%a0%e5%b0%84" aria-label="3.4 IO 地址映射">3.4 IO 地址映射</a></li>
+            <li>
+                <a href="#35-%e6%8b%93%e6%89%91%e7%bb%84%e6%80%81%e5%8f%af%e9%80%89%e4%bd%86%e6%8e%a8%e8%8d%90" aria-label="3.5 拓扑组态（可选但推荐）">3.5 拓扑组态（可选但推荐）</a></li>
+            <li>
+                <a href="#36-%e7%bc%96%e8%af%91%e4%b8%8b%e8%bd%bd" aria-label="3.6 编译下载">3.6 编译下载</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%9b%9b%e5%ae%9e%e6%88%98%e7%a4%ba%e4%be%8bs7-1200--%e4%b8%80%e5%8f%b0-et-200sp" aria-label="四、实战示例：S7-1200 &#43; 一台 ET 200SP">四、实战示例：S7-1200 + 一台 ET 200SP</a></li>
+            <li>
+                <a href="#%e4%ba%94%e5%b8%b8%e8%a7%81%e9%97%ae%e9%a2%98%e4%b8%8e%e8%af%8a%e6%96%ad" aria-label="五、常见问题与诊断">五、常见问题与诊断</a><ul>
+                    
+            <li>
+                <a href="#51-%e9%ab%98%e9%a2%91%e9%97%ae%e9%a2%98" aria-label="5.1 高频问题">5.1 高频问题</a></li>
+            <li>
+                <a href="#52-%e5%88%a9%e7%94%a8%e8%af%8a%e6%96%ad%e5%8a%9f%e8%83%bd" aria-label="5.2 利用诊断功能">5.2 利用诊断功能</a></li>
+            <li>
+                <a href="#53-%e6%8e%92%e6%9f%a5%e5%8f%a3%e8%af%80" aria-label="5.3 排查口诀">5.3 排查口诀</a></li></ul>
+            </li>
+            <li>
+                <a href="#%e5%85%ad%e8%a6%81%e7%82%b9%e9%80%9f%e6%9f%a5" aria-label="六、要点速查">六、要点速查</a></li>
+            <li>
+                <a href="#%e7%bb%93%e8%af%ad" aria-label="结语">结语</a>
+            </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><p>在稍具规模的自动化系统中，IO 点往往分散在多个机柜、多台设备上。如果全部用导线拉回主控柜，线缆成本高、施工繁琐、维护困难。<strong>分布式 IO</strong> 把 IO 模块就近安装在现场，通过一根总线与 PLC 通讯，大幅减少接线。本文讲解 <strong>S7-1200 如何通过 PROFINET 连接 ET 200 系列分布式 IO</strong>，覆盖从概念、组态到诊断的完整流程。</p>
+<h2 id="一分布式-io-基础">一、分布式 IO 基础<a hidden class="anchor" aria-hidden="true" href="#一分布式-io-基础">#</a></h2>
+<h3 id="11-什么是分布式-io">1.1 什么是分布式 IO<a hidden class="anchor" aria-hidden="true" href="#11-什么是分布式-io">#</a></h3>
+<ul>
+<li><strong>集中式 IO</strong>：IO 模块直接插在 CPU 旁边（S7-1200 本体 + 信号模块 SM），所有现场信号用导线拉回主控柜。</li>
+<li><strong>分布式 IO（Distributed IO）</strong>：IO 站就近安装在现场设备旁，只用一根 PROFINET 网线（或 PROFIBUS 电缆）连回 PLC。现场信号在本地接线，数据通过总线传输。</li>
+</ul>
+<p>优势：节省线缆、施工和调试更快、扩展灵活、便于模块化设计与远程诊断。</p>
+<h3 id="12-s7-1200-支持的连接方式">1.2 S7-1200 支持的连接方式<a hidden class="anchor" aria-hidden="true" href="#12-s7-1200-支持的连接方式">#</a></h3>
+<p>S7-1200 本体只有 <strong>PROFINET 口</strong>，因此分布式 IO 主要走 <strong>PROFINET IO</strong>：</p>
+<table>
+	<thead>
+			<tr>
+					<th>方式</th>
+					<th>说明</th>
+					<th>S7-1200 支持</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><strong>PROFINET IO</strong></td>
+					<td>基于工业以太网，即插即用、诊断强</td>
+					<td>✅ 原生支持（本体 PN 口）</td>
+			</tr>
+			<tr>
+					<td>PROFIBUS DP</td>
+					<td>传统现场总线</td>
+					<td>需加 <strong>CM 1243-5</strong>（DP 主站）通讯模块</td>
+			</tr>
+	</tbody>
+</table>
+<p>本文以主流的 <strong>PROFINET IO</strong> 为主。S7-1200 作为 <strong>IO 控制器（Controller）</strong>，ET 200 等分布式站作为 <strong>IO 设备（Device）</strong>。</p>
+<h3 id="13-常见-et-200-分布式-io-家族">1.3 常见 ET 200 分布式 IO 家族<a hidden class="anchor" aria-hidden="true" href="#13-常见-et-200-分布式-io-家族">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th>型号</th>
+					<th>特点</th>
+					<th>典型场景</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><strong>ET 200SP</strong></td>
+					<td>新一代、紧凑、热插拔、单通道可更换</td>
+					<td>当前主流首选</td>
+			</tr>
+			<tr>
+					<td>ET 200S</td>
+					<td>上一代模块化 IO</td>
+					<td>存量系统</td>
+			</tr>
+			<tr>
+					<td>ET 200MP</td>
+					<td>高性能、与 S7-1500 同模块</td>
+					<td>大型 IO 站</td>
+			</tr>
+			<tr>
+					<td>ET 200eco PN</td>
+					<td>一体式、IP67 现场防护</td>
+					<td>无需机柜、直接装设备上</td>
+			</tr>
+			<tr>
+					<td>ET 200pro</td>
+					<td>IP65/67 高防护模块化</td>
+					<td>恶劣环境</td>
+			</tr>
+	</tbody>
+</table>
+<p>每个 ET 200 站由 <strong>接口模块（IM，如 ET 200SP 的 IM 155-6 PN）+ IO 模块（DI/DO/AI/AO）+ 服务模块/终端</strong> 组成。</p>
+<hr>
+<h2 id="二组态前准备">二、组态前准备<a hidden class="anchor" aria-hidden="true" href="#二组态前准备">#</a></h2>
+<h3 id="21-网络规划">2.1 网络规划<a hidden class="anchor" aria-hidden="true" href="#21-网络规划">#</a></h3>
+<ol>
+<li>规划 IP 网段：PLC 与所有 PROFINET 设备需在<strong>同一子网</strong>（如 <code>192.168.0.x</code>）。</li>
+<li>规划 <strong>PROFINET 设备名称</strong>：每台 IO 设备一个唯一名称（如 <code>et200sp-1</code>），这是 PROFINET 寻址的关键。</li>
+<li>物理拓扑：PLC ↔ 交换机 ↔ 各 IO 站，或线型菊花链（ET 200SP 接口模块自带双口可串接）。</li>
+</ol>
+<h3 id="22-安装-gsd-文件如需要">2.2 安装 GSD 文件（如需要）<a hidden class="anchor" aria-hidden="true" href="#22-安装-gsd-文件如需要">#</a></h3>
+<p>TIA Portal 硬件目录里已自带常见西门子 ET 200 模块，一般<strong>无需额外安装</strong>。若使用较新模块或第三方 PROFINET 设备，需通过 <code>选项 → 管理通用站描述文件（GSD）</code> 安装对应 <strong>GSDML</strong> 文件。</p>
+<hr>
+<h2 id="三tia-portal-组态步骤">三、TIA Portal 组态步骤<a hidden class="anchor" aria-hidden="true" href="#三tia-portal-组态步骤">#</a></h2>
+<h3 id="31-添加并连接设备">3.1 添加并连接设备<a hidden class="anchor" aria-hidden="true" href="#31-添加并连接设备">#</a></h3>
+<ol>
+<li>新建项目，添加 S7-1200 CPU。</li>
+<li>进入<strong>网络视图</strong>，从右侧硬件目录 <code>分布式 I/O → ET 200SP → 接口模块</code> 拖出对应 IM（如 <code>IM 155-6 PN ST</code>）到网络视图。</li>
+<li>用鼠标从 <strong>CPU 的 PROFINET 口</strong> 拖一条线到 <strong>ET 200 的 PN 口</strong>，建立 PROFINET IO 系统（连线变绿，出现 <code>PNIO</code> 系统）。</li>
+</ol>
+<h3 id="32-配置-et-200-站的-io-模块">3.2 配置 ET 200 站的 IO 模块<a hidden class="anchor" aria-hidden="true" href="#32-配置-et-200-站的-io-模块">#</a></h3>
+<ol>
+<li>双击 ET 200 站进入<strong>设备视图</strong>。</li>
+<li>从硬件目录按现场实际，依次插入 DI、DO、AI、AO 等模块到对应槽位，<strong>顺序和型号必须与实物完全一致</strong>。</li>
+<li>ET 200SP 还需在末尾放置 <strong>服务器模块（Server Module）</strong> 作为终端。</li>
+</ol>
+<h3 id="33-分配-ip-地址与设备名称">3.3 分配 IP 地址与设备名称<a hidden class="anchor" aria-hidden="true" href="#33-分配-ip-地址与设备名称">#</a></h3>
+<p>这是 PROFINET 能否通讯的<strong>核心</strong>：</p>
+<ol>
+<li>选中 ET 200 的接口模块 → 属性 → 以太网地址：
+<ul>
+<li>设置 <strong>IP 地址</strong>（与 PLC 同网段）；</li>
+<li>设置 <strong>PROFINET 设备名称</strong>（组态名称）。</li>
+</ul>
+</li>
+<li>组态名称只是「图纸上的名字」，必须写进实物设备：
+<ul>
+<li>在线状态下 <code>在线 → 分配设备名称</code>，把组态名称下发到实际 IO 设备；</li>
+<li>也可 <code>分配 IP 地址</code> 在线写 IP。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>关键</strong>：实际设备的 PROFINET 名称必须与组态中的名称<strong>完全一致</strong>，PROFINET 启动时靠名称找设备、再分配 IP。名称对不上 → 设备红叉、无法进入数据交换。</p>
+</blockquote>
+<h3 id="34-io-地址映射">3.4 IO 地址映射<a hidden class="anchor" aria-hidden="true" href="#34-io-地址映射">#</a></h3>
+<p>插入模块后，TIA Portal 会自动给每个模块分配 <strong>I/O 地址（输入 I 区、输出 Q 区）</strong>：</p>
+<ul>
+<li>在设备视图选中模块，「I/O 地址」里可看到/修改起始地址，例如某 DI 16 通道模块占 <code>I0.0~I1.7</code>。</li>
+<li>程序里直接用这些 I/Q 地址访问现场信号，<strong>与本体 IO 用法完全相同</strong>，感受不到「分布式」的存在。</li>
+</ul>
+<table>
+	<thead>
+			<tr>
+					<th>模块</th>
+					<th>类型</th>
+					<th>自动分配地址（示例）</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>DI 16×24VDC</td>
+					<td>数字量输入</td>
+					<td>I0.0 ~ I1.7</td>
+			</tr>
+			<tr>
+					<td>DQ 16×24VDC</td>
+					<td>数字量输出</td>
+					<td>Q0.0 ~ Q1.7</td>
+			</tr>
+			<tr>
+					<td>AI 4×U/I</td>
+					<td>模拟量输入</td>
+					<td>IW64 ~ IW70</td>
+			</tr>
+			<tr>
+					<td>AQ 2×U/I</td>
+					<td>模拟量输出</td>
+					<td>QW80 ~ QW82</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="35-拓扑组态可选但推荐">3.5 拓扑组态（可选但推荐）<a hidden class="anchor" aria-hidden="true" href="#35-拓扑组态可选但推荐">#</a></h3>
+<p>在<strong>拓扑视图</strong>中，把各设备的端口按实际网线连接关系连好。好处：</p>
+<ul>
+<li>启用<strong>端口互联</strong>后，可使用 <strong>不带交换机更换设备（LLDP 邻居检测）</strong>：换上同型号新设备无需重新分配名称，控制器自动按拓扑识别并下发名称。</li>
+<li>拓扑诊断更直观，断线/错插能精确定位到端口。</li>
+</ul>
+<h3 id="36-编译下载">3.6 编译下载<a hidden class="anchor" aria-hidden="true" href="#36-编译下载">#</a></h3>
+<p>组态完成后编译、下载到 PLC。下载后 PLC 会按设备名称启动各 IO 站，进入循环数据交换。</p>
+<hr>
+<h2 id="四实战示例s7-1200--一台-et-200sp">四、实战示例：S7-1200 + 一台 ET 200SP<a hidden class="anchor" aria-hidden="true" href="#四实战示例s7-1200--一台-et-200sp">#</a></h2>
+<p>场景：S7-1200（IP <code>192.168.0.1</code>）通过 PROFINET 连接一台 ET 200SP（IP <code>192.168.0.10</code>，名称 <code>et200sp-1</code>），站上有 16 点 DI、16 点 DO。</p>
+<p>步骤：</p>
+<ol>
+<li>网络视图添加 CPU 与 ET 200SP（IM 155-6 PN ST），连线建立 PNIO 系统。</li>
+<li>ET 200SP 设备视图依次插入：DI 16×24VDC、DQ 16×24VDC、服务器模块。</li>
+<li>接口模块设 IP <code>192.168.0.10</code>、设备名 <code>et200sp-1</code>。</li>
+<li>记下自动分配的地址：DI → <code>I8.0~I9.7</code>，DO → <code>Q8.0~Q9.7</code>（示例，以实际为准）。</li>
+<li><code>在线 → 分配设备名称</code>，把 <code>et200sp-1</code> 写入实物。</li>
+<li>编译下载。</li>
+<li>程序里直接用：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">// 读现场按钮（接在 ET 200SP 的 DI 上）
+</span></span><span class="line"><span class="cl">IF &#34;I8.0&#34; THEN          // 现场启动按钮
+</span></span><span class="line"><span class="cl">    &#34;Q8.0&#34; := TRUE;     // 驱动现场指示灯/继电器
+</span></span><span class="line"><span class="cl">END_IF;
+</span></span></code></pre></div><p>—— 程序中完全像用本体 IO 一样使用分布式 IO 点。</p>
+<hr>
+<h2 id="五常见问题与诊断">五、常见问题与诊断<a hidden class="anchor" aria-hidden="true" href="#五常见问题与诊断">#</a></h2>
+<h3 id="51-高频问题">5.1 高频问题<a hidden class="anchor" aria-hidden="true" href="#51-高频问题">#</a></h3>
+<table>
+	<thead>
+			<tr>
+					<th>现象</th>
+					<th>可能原因</th>
+					<th>排查方向</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>设备红叉、不进入数据交换</td>
+					<td>设备名称未分配/不一致</td>
+					<td><code>在线 → 分配设备名称</code>，确保与组态一致</td>
+			</tr>
+			<tr>
+					<td>找不到设备</td>
+					<td>IP 不同网段、网线、交换机</td>
+					<td>核对 IP 同网段、<code>在线访问</code>扫描设备</td>
+			</tr>
+			<tr>
+					<td>组态与实际不符报警</td>
+					<td>模块型号/槽位/顺序不一致</td>
+					<td>对照实物逐槽核对模块订货号</td>
+			</tr>
+			<tr>
+					<td>模块通道无信号</td>
+					<td>接线、供电、通道参数</td>
+					<td>查现场接线、负载电源、模块诊断</td>
+			</tr>
+			<tr>
+					<td>站点偶尔掉线</td>
+					<td>网线/接头、干扰、电源</td>
+					<td>检查屏蔽接地、网线质量、24V 供电</td>
+			</tr>
+			<tr>
+					<td>更换新设备后不通</td>
+					<td>新设备无名称</td>
+					<td>重新分配名称，或用拓扑+LLDP 自动命名</td>
+			</tr>
+	</tbody>
+</table>
+<h3 id="52-利用诊断功能">5.2 利用诊断功能<a hidden class="anchor" aria-hidden="true" href="#52-利用诊断功能">#</a></h3>
+<p>PROFINET 的强项就是诊断：</p>
+<ul>
+<li><strong>在线 &amp; 诊断</strong>：选中设备查看状态、模块级/通道级故障（如断线、过载、超量程）能精确到通道。</li>
+<li><strong>设备 LED</strong>：接口模块的 BF（总线故障）、SF（系统故障）灯指示连接与模块状态。</li>
+<li><strong>诊断中断 OB</strong>：组态诊断中断后，模块故障会触发 <code>OB82</code>（诊断错误中断），可在程序里读取并处理。</li>
+<li><strong>拓扑对比</strong>：拓扑视图在线对比「组态 vs 实际」，错接/断线一目了然。</li>
+</ul>
+<h3 id="53-排查口诀">5.3 排查口诀<a hidden class="anchor" aria-hidden="true" href="#53-排查口诀">#</a></h3>
+<ol>
+<li><strong>先通网络</strong>：IP 同网段，<code>在线访问</code>能扫到设备。</li>
+<li><strong>再核名称</strong>：PROFINET 设备名组态与实物完全一致（最高频故障）。</li>
+<li><strong>后对组态</strong>：模块型号、槽位、顺序与实物逐一对应。</li>
+<li><strong>看诊断灯/缓冲区</strong>：BF/SF 灯 + 在线诊断定位到模块/通道。</li>
+<li><strong>用拓扑</strong>：组态端口互联，断线错插精确定位、换件免命名。</li>
+</ol>
+<hr>
+<h2 id="六要点速查">六、要点速查<a hidden class="anchor" aria-hidden="true" href="#六要点速查">#</a></h2>
+<table>
+	<thead>
+			<tr>
+					<th>环节</th>
+					<th>关键点</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>连接方式</td>
+					<td>S7-1200 本体 PN 口走 PROFINET IO；DP 需加 CM 1243-5</td>
+			</tr>
+			<tr>
+					<td>角色</td>
+					<td>CPU = IO 控制器；ET 200 = IO 设备</td>
+			</tr>
+			<tr>
+					<td>寻址核心</td>
+					<td><strong>PROFINET 设备名称</strong> 必须组态与实物一致</td>
+			</tr>
+			<tr>
+					<td>IP</td>
+					<td>所有设备同子网</td>
+			</tr>
+			<tr>
+					<td>模块组态</td>
+					<td>型号/槽位/顺序与实物完全一致，ET 200SP 末尾加服务器模块</td>
+			</tr>
+			<tr>
+					<td>地址使用</td>
+					<td>自动分配 I/Q 地址，程序里像本体 IO 一样用</td>
+			</tr>
+			<tr>
+					<td>拓扑</td>
+					<td>组态端口互联，支持换件免命名 + 精确诊断</td>
+			</tr>
+			<tr>
+					<td>诊断</td>
+					<td>在线诊断到通道级 + OB82 诊断中断</td>
+			</tr>
+	</tbody>
+</table>
+<hr>
+<h2 id="结语">结语<a hidden class="anchor" aria-hidden="true" href="#结语">#</a></h2>
+<p>S7-1200 通过 PROFINET 接入 ET 200 分布式 IO，本质上就是把现场 IO「搬」到总线另一端，而对程序员几乎透明 —— 组态完成后，分布式 IO 点和本体 IO 用法完全一样。整个过程最容易卡住的就一处：<strong>PROFINET 设备名称必须组态与实物一致</strong>，这是 PROFINET 寻址的根基；其次是<strong>模块型号与槽位顺序要和实物对齐</strong>。配合拓扑组态和强大的通道级诊断，分布式 IO 不仅省线省工，出了故障也能快速定位到具体模块和通道，是现代自动化系统的标准做法。</p>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://zmlgogogo.github.io/tags/%E8%A5%BF%E9%97%A8%E5%AD%90/">西门子</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/plc/">PLC</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/s7-1200/">S7-1200</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8Fio/">分布式IO</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/et200/">ET200</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/profinet/">PROFINET</a></li>
+      <li><a href="https://zmlgogogo.github.io/tags/tia-portal/">TIA Portal</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://zmlgogogo.github.io/posts/siemens-profibus-dp/">
+    <span class="title">« 上一页</span>
+    <span>西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）</span>
+  </a>
+  <a class="next" href="https://zmlgogogo.github.io/posts/siemens-open-user-communication/">
+    <span class="title">下一页 »</span>
+    <span>西门子开放式用户通讯 OUC 详解：TSEND_C / TRCV_C（S7-1200/1500）</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© <a href="https://github.com/zmlgogogo">zml</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = '复制';
+
+        function copyingDone() {
+            copybutton.innerHTML = '已复制！';
+            setTimeout(() => {
+                copybutton.innerHTML = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

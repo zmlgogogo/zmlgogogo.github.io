@@ -152,51 +152,51 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">西门子 V90 伺服驱动调试配置全流程详解
+    <h2 class="entry-hint-parent">西门子 G120 / V20 变频器 PROFINET 控制详解（S7-1200/1500）
     </h2>
   </header>
   <div class="entry-content">
-    <p>SINAMICS V90 是西门子面向通用运动控制的经济型伺服驱动，搭配 SIMOTICS S-1FL6 伺服电机，广泛用于定位、收放卷、贴标、包装等场合。本文按实际调试顺序，系统梳理 V90 从硬件接线 → 版本选型 → 参数设置 → 试运行 → 与 PLC 通讯组态的完整流程，覆盖脉冲（PTI）和 PROFINET（PN）两种主流版本。
+    <p>变频器是工业现场用量最大的执行设备之一，用于风机、水泵、传送带等的调速控制。西门子 SINAMICS G120（模块化通用变频器）与 V20（紧凑经济型）都支持 PROFINET，可由 S7-1200/1500 通过总线直接起停、调速、读取状态。本文讲解 G120/V20 经 PROFINET 与 PLC 的通讯控制全流程。和前面 V90 伺服那篇正好配成「运动控制」双子篇。
 ...</p>
   </div>
   <footer class="entry-footer">
 
-<span title='2026-06-12 00:00:00 +0000 UTC'>2026年06月12日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
-  <a class="entry-link" aria-label="post link to 西门子 V90 伺服驱动调试配置全流程详解" href="https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/"></a>
+<span title='2026-06-13 00:00:00 +0000 UTC'>2026年06月13日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
+  <a class="entry-link" aria-label="post link to 西门子 G120 / V20 变频器 PROFINET 控制详解（S7-1200/1500）" href="https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">西门子 PLC 的 Modbus (RTU) 通讯指令详解
+    <h2 class="entry-hint-parent">西门子 PID_Compact 闭环控制调试详解（S7-1200/1500）
     </h2>
   </header>
   <div class="entry-content">
-    <p>Modbus RTU 是工业现场最常见的串行通讯协议之一，凭借协议开放、实现简单、设备支持广泛的特点，被大量用于 PLC 与变频器、仪表、温控器、电表等设备之间的数据交换。本文系统梳理西门子两大主流平台 —— S7-1200/1500（TIA Portal） 与 S7-200 SMART —— 中 Modbus RTU 通讯指令的用法、参数含义和实战要点。
+    <p>温度、压力、流量、液位这类连续量的稳定控制，几乎都离不开 PID 闭环。西门子 S7-1200/1500 内置了 PID_Compact 工艺对象，把 PID 算法、自整定、量程标定封装好，配上图形化调试面板，让闭环控制变得相当简单。本文讲解 PID_Compact 的原理、组态、参数与整定调试全流程。
 ...</p>
   </div>
   <footer class="entry-footer">
 
-<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>5 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
-  <a class="entry-link" aria-label="post link to 西门子 PLC 的 Modbus (RTU) 通讯指令详解" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/"></a>
+<span title='2026-06-13 00:00:00 +0000 UTC'>2026年06月13日</span>&nbsp;·&nbsp;<span>2 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
+  <a class="entry-link" aria-label="post link to 西门子 PID_Compact 闭环控制调试详解（S7-1200/1500）" href="https://zmlgogogo.github.io/posts/siemens-pid-compact/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV
+    <h2 class="entry-hint-parent">西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）
     </h2>
   </header>
   <div class="entry-content">
-    <p>S7 通讯（S7 Communication）是西门子私有的、专门用于 SIMATIC 设备之间 数据交换的协议，运行在工业以太网之上。相比 Modbus 这类开放协议，S7 通讯与西门子硬件深度集成、配置简单、传输高效，是 S7-300/400/1200/1500 之间互联数据的首选方式。本文聚焦 S7-1200 / S7-1500（TIA Portal） 平台，讲解 S7 通讯的两类实现：单边通讯（PUT/GET） 与 双边通讯（BSEND/BRCV）。
+    <p>PROFIBUS DP 是西门子推广多年、至今仍大量在役的经典现场总线。虽然 PROFINET 已成主流，但大量存量设备、变频器、分布式 IO 仍以 DP 接口为主。本文讲解西门子 PLC 的 PROFIBUS DP 通讯组态，覆盖 S7-1200（经 CM 1243-5） 与 S7-1500（集成/CM DP 口） 两种平台。
 ...</p>
   </div>
   <footer class="entry-footer">
 
-<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>4 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
-  <a class="entry-link" aria-label="post link to 西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV" href="https://zmlgogogo.github.io/posts/siemens-s7-communication/"></a>
+<span title='2026-06-13 00:00:00 +0000 UTC'>2026年06月13日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
+  <a class="entry-link" aria-label="post link to 西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）" href="https://zmlgogogo.github.io/posts/siemens-profibus-dp/"></a>
 </article>
 <footer class="page-footer">
   <nav class="pagination">
-    <a class="next" href="https://zmlgogogo.github.io/categories/%E5%B7%A5%E4%B8%9A%E8%87%AA%E5%8A%A8%E5%8C%96/page/2/">下一页&nbsp;2/2&nbsp;»
+    <a class="next" href="https://zmlgogogo.github.io/categories/%E5%B7%A5%E4%B8%9A%E8%87%AA%E5%8A%A8%E5%8C%96/page/2/">下一页&nbsp;2/3&nbsp;»
     </a>
   </nav>
 </footer>

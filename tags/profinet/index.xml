@@ -7,8 +7,22 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Fri, 12 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/tags/profinet/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 G120 / V20 变频器 PROFINET 控制详解（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/</guid>
+      <description>讲解西门子 G120 / V20 变频器经 PROFINET 与 S7-1200/1500 通讯控制：标准报文 1/352、控制字 STW1 与状态字 ZSW1、主设定值频率换算、起停调速编程，以及 BOP/参数设置与常见故障排查。</description>
+    </item>
+    <item>
+      <title>西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/</guid>
+      <description>讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。</description>
+    </item>
     <item>
       <title>西门子 V90 伺服驱动调试配置全流程详解</title>
       <link>https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/</link>

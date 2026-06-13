@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>TSEND_C on ZML&#39;s Blogs</title>
+    <link>https://zmlgogogo.github.io/tags/tsend_c/</link>
+    <description>Recent content in TSEND_C on ZML&#39;s Blogs</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <copyright>zml</copyright>
+    <lastBuildDate>Sat, 13 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://zmlgogogo.github.io/tags/tsend_c/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子开放式用户通讯 OUC 详解：TSEND_C / TRCV_C（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-open-user-communication/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-open-user-communication/</guid>
+      <description>讲解西门子 S7-1200/1500 的开放式用户通讯（OUC），用 TSEND_C / TRCV_C 实现与上位机、第三方设备的 TCP/ISO-on-TCP/UDP 自由通讯，涵盖连接参数 TCON、收发指令参数、数据收发处理与常见排查。</description>
+    </item>
+  </channel>
+</rss>

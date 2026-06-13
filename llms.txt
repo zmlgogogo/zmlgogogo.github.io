@@ -1,6 +1,11 @@
 # ZML's Blogs
 
 ## Posts
+- [西门子 G120 / V20 变频器 PROFINET 控制详解（S7-1200/1500）](https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/)
+- [西门子 PID_Compact 闭环控制调试详解（S7-1200/1500）](https://zmlgogogo.github.io/posts/siemens-pid-compact/)
+- [西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）](https://zmlgogogo.github.io/posts/siemens-profibus-dp/)
+- [西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200](https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/)
+- [西门子开放式用户通讯 OUC 详解：TSEND_C / TRCV_C（S7-1200/1500）](https://zmlgogogo.github.io/posts/siemens-open-user-communication/)
 - [西门子 V90 伺服驱动调试配置全流程详解](https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/)
 - [西门子 PLC 的 Modbus (RTU) 通讯指令详解](https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/)
 - [西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV](https://zmlgogogo.github.io/posts/siemens-s7-communication/)

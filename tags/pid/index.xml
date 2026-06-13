@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>PID on ZML&#39;s Blogs</title>
+    <link>https://zmlgogogo.github.io/tags/pid/</link>
+    <description>Recent content in PID on ZML&#39;s Blogs</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <copyright>zml</copyright>
+    <lastBuildDate>Sat, 13 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://zmlgogogo.github.io/tags/pid/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 PID_Compact 闭环控制调试详解（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-pid-compact/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-pid-compact/</guid>
+      <description>讲解西门子 S7-1200/1500 的 PID_Compact 工艺对象：PID 闭环控制原理、组态步骤、Input/Output 参数、量程标定、手动/自动整定（预调节与精确调节）、参数 Kp/Ti/Td 含义与温度压力闭环调试排查。</description>
+    </item>
+  </channel>
+</rss>

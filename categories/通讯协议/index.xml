@@ -7,8 +7,22 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Wed, 10 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/categories/%E9%80%9A%E8%AE%AF%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-profibus-dp/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-profibus-dp/</guid>
+      <description>讲解西门子 PLC 的 PROFIBUS DP 现场总线：S7-1200 经 CM 1243-5 作主站、S7-1500 集成 DP 口，涵盖 GSD 安装、主从组态、站地址与波特率、终端电阻、IO 地址映射与常见诊断排查。</description>
+    </item>
+    <item>
+      <title>西门子开放式用户通讯 OUC 详解：TSEND_C / TRCV_C（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-open-user-communication/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-open-user-communication/</guid>
+      <description>讲解西门子 S7-1200/1500 的开放式用户通讯（OUC），用 TSEND_C / TRCV_C 实现与上位机、第三方设备的 TCP/ISO-on-TCP/UDP 自由通讯，涵盖连接参数 TCON、收发指令参数、数据收发处理与常见排查。</description>
+    </item>
     <item>
       <title>西门子 PLC 的 Modbus (RTU) 通讯指令详解</title>
       <link>https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/</link>

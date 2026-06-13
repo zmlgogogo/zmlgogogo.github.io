@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>S7-1200 on ZML&#39;s Blogs</title>
+    <link>https://zmlgogogo.github.io/tags/s7-1200/</link>
+    <description>Recent content in S7-1200 on ZML&#39;s Blogs</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <copyright>zml</copyright>
+    <lastBuildDate>Sat, 13 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://zmlgogogo.github.io/tags/s7-1200/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/</guid>
+      <description>讲解 S7-1200 如何通过 PROFINET 连接 ET 200SP / ET 200S / ET 200MP 等分布式 IO，涵盖分布式 IO 的概念、GSD 安装、设备组态、设备名与 IP 分配、IO 地址映射、拓扑组态与常见诊断排查。</description>
+    </item>
+  </channel>
+</rss>

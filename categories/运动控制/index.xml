@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>zh-cn</language>
     <copyright>zml</copyright>
-    <lastBuildDate>Fri, 12 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Jun 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://zmlgogogo.github.io/categories/%E8%BF%90%E5%8A%A8%E6%8E%A7%E5%88%B6/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>西门子 G120 / V20 变频器 PROFINET 控制详解（S7-1200/1500）</title>
+      <link>https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/</link>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 +0000</pubDate>
+      <guid>https://zmlgogogo.github.io/posts/siemens-g120-v20-inverter-profinet/</guid>
+      <description>讲解西门子 G120 / V20 变频器经 PROFINET 与 S7-1200/1500 通讯控制：标准报文 1/352、控制字 STW1 与状态字 ZSW1、主设定值频率换算、起停调速编程，以及 BOP/参数设置与常见故障排查。</description>
+    </item>
     <item>
       <title>西门子 V90 伺服驱动调试配置全流程详解</title>
       <link>https://zmlgogogo.github.io/posts/siemens-v90-servo-commissioning/</link>

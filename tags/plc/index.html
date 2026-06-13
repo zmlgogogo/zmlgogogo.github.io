@@ -152,48 +152,54 @@
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">西门子 PLC 的 Modbus (RTU) 通讯指令详解
+    <h2 class="entry-hint-parent">西门子 PID_Compact 闭环控制调试详解（S7-1200/1500）
     </h2>
   </header>
   <div class="entry-content">
-    <p>Modbus RTU 是工业现场最常见的串行通讯协议之一，凭借协议开放、实现简单、设备支持广泛的特点，被大量用于 PLC 与变频器、仪表、温控器、电表等设备之间的数据交换。本文系统梳理西门子两大主流平台 —— S7-1200/1500（TIA Portal） 与 S7-200 SMART —— 中 Modbus RTU 通讯指令的用法、参数含义和实战要点。
+    <p>温度、压力、流量、液位这类连续量的稳定控制，几乎都离不开 PID 闭环。西门子 S7-1200/1500 内置了 PID_Compact 工艺对象，把 PID 算法、自整定、量程标定封装好，配上图形化调试面板，让闭环控制变得相当简单。本文讲解 PID_Compact 的原理、组态、参数与整定调试全流程。
 ...</p>
   </div>
   <footer class="entry-footer">
 
-<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>5 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
-  <a class="entry-link" aria-label="post link to 西门子 PLC 的 Modbus (RTU) 通讯指令详解" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-rtu/"></a>
+<span title='2026-06-13 00:00:00 +0000 UTC'>2026年06月13日</span>&nbsp;·&nbsp;<span>2 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
+  <a class="entry-link" aria-label="post link to 西门子 PID_Compact 闭环控制调试详解（S7-1200/1500）" href="https://zmlgogogo.github.io/posts/siemens-pid-compact/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV
+    <h2 class="entry-hint-parent">西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）
     </h2>
   </header>
   <div class="entry-content">
-    <p>S7 通讯（S7 Communication）是西门子私有的、专门用于 SIMATIC 设备之间 数据交换的协议，运行在工业以太网之上。相比 Modbus 这类开放协议，S7 通讯与西门子硬件深度集成、配置简单、传输高效，是 S7-300/400/1200/1500 之间互联数据的首选方式。本文聚焦 S7-1200 / S7-1500（TIA Portal） 平台，讲解 S7 通讯的两类实现：单边通讯（PUT/GET） 与 双边通讯（BSEND/BRCV）。
+    <p>PROFIBUS DP 是西门子推广多年、至今仍大量在役的经典现场总线。虽然 PROFINET 已成主流，但大量存量设备、变频器、分布式 IO 仍以 DP 接口为主。本文讲解西门子 PLC 的 PROFIBUS DP 通讯组态，覆盖 S7-1200（经 CM 1243-5） 与 S7-1500（集成/CM DP 口） 两种平台。
 ...</p>
   </div>
   <footer class="entry-footer">
 
-<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>4 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
-  <a class="entry-link" aria-label="post link to 西门子 S7 通讯（S7-1200/1500）详解：PUT/GET 与 BSEND/BRCV" href="https://zmlgogogo.github.io/posts/siemens-s7-communication/"></a>
+<span title='2026-06-13 00:00:00 +0000 UTC'>2026年06月13日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
+  <a class="entry-link" aria-label="post link to 西门子 PROFIBUS DP 通讯组态详解（S7-1200/1500）" href="https://zmlgogogo.github.io/posts/siemens-profibus-dp/"></a>
 </article>
 
 <article class="post-entry tag-entry"> 
   <header class="entry-header">
-    <h2 class="entry-hint-parent">西门子 S7-1200/1500 的 Modbus TCP 通讯详解
+    <h2 class="entry-hint-parent">西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200
     </h2>
   </header>
   <div class="entry-content">
-    <p>Modbus TCP 是 Modbus 协议在以太网上的实现，把原本运行于 RS-485/RS-232 的 Modbus 报文封装进 TCP/IP，借助以太网实现更高速率、更长距离和更灵活的组网。本文聚焦 S7-1200 / S7-1500（TIA Portal） 平台，系统讲解 Modbus TCP 的指令用法、连接组态与实战要点。S7-200 SMART 不在本文范围内。
+    <p>在稍具规模的自动化系统中，IO 点往往分散在多个机柜、多台设备上。如果全部用导线拉回主控柜，线缆成本高、施工繁琐、维护困难。分布式 IO 把 IO 模块就近安装在现场，通过一根总线与 PLC 通讯，大幅减少接线。本文讲解 S7-1200 如何通过 PROFINET 连接 ET 200 系列分布式 IO，覆盖从概念、组态到诊断的完整流程。
 ...</p>
   </div>
   <footer class="entry-footer">
 
-<span title='2026-06-10 00:00:00 +0000 UTC'>2026年06月10日</span>&nbsp;·&nbsp;<span>4 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
-  <a class="entry-link" aria-label="post link to 西门子 S7-1200/1500 的 Modbus TCP 通讯详解" href="https://zmlgogogo.github.io/posts/siemens-plc-modbus-tcp/"></a>
+<span title='2026-06-13 00:00:00 +0000 UTC'>2026年06月13日</span>&nbsp;·&nbsp;<span>3 分钟</span>&nbsp;·&nbsp;<span>ZML</span></footer>
+  <a class="entry-link" aria-label="post link to 西门子 S7-1200 分布式 IO 组态详解：PROFINET 接入 ET 200" href="https://zmlgogogo.github.io/posts/siemens-s7-1200-distributed-io/"></a>
 </article>
+<footer class="page-footer">
+  <nav class="pagination">
+    <a class="next" href="https://zmlgogogo.github.io/tags/plc/page/2/">下一页&nbsp;2/3&nbsp;»
+    </a>
+  </nav>
+</footer>
     </main>
     
 <footer class="footer">
